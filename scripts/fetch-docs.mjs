@@ -47,6 +47,7 @@ function sectionFor(relPath) {
   if (relPath === 'agent-setup.md') return 'Getting started'
   if (relPath === 'day-to-day.md') return 'Getting started'
   if (relPath === 'upgrade.md') return 'Getting started'
+  if (relPath === 'changelog.md') return 'Getting started'
   if (relPath === 'troubleshooting.md') return 'Troubleshooting'
   return null
 }
