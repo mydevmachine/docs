@@ -1,0 +1,23 @@
+scripts/fetch-docs.mjs
+  s_8115d46bdb9084::t_e2ca68c427a494 50
+src/pages/index.astro
+  s_8115d46bdb9084::t_dbc1d6cf7c3288 223
+src/pages/preview/pipes.astro
+  s_8115d46bdb9084::t_c349120de3d79e 14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c72da153bc3c1844d26e04af3bc32cd9276a87ca",
+  "prompts": {},
+  "sessions": {
+    "s_8115d46bdb9084": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dca45873-7fec-442f-8467-92b47eab8ff1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Djalma Araújo <djalma@nossomos.cc>"
+    }
+  }
+}
