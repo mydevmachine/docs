@@ -6,1342 +6,484 @@ interface Props {
 }
 
 const { eyebrow, headline, subline } = Astro.props
-
-interface Step {
-  cmd: string
-  out: string[]
-}
-
-interface Win {
-  id: string
-  title: string
-  typeMs: number
-  steps: Step[]
-}
-
-interface MacLine {
-  text: string
-  tone: 'cmd' | 'ok' | 'muted' | 'agent'
-  typed?: boolean
-}
-
-const macPanes: { name: string; lines: MacLine[] }[] = [
-  {
-    name: 'claude',
-    lines: [
-      { text: 'claude › fix retry loop', tone: 'agent', typed: true },
-      { text: '● Edit(api/retry.ts)', tone: 'muted' },
-      { text: '✓ 41 tests passed', tone: 'ok' },
-    ],
-  },
-  {
-    name: 'dev',
-    lines: [
-      { text: '$ npm run dev', tone: 'cmd', typed: true },
-      { text: 'vite ready in 318 ms', tone: 'ok' },
-      { text: '➜ localhost:5173', tone: 'muted' },
-    ],
-  },
-  {
-    name: 'codex',
-    lines: [
-      { text: 'codex › hero copy', tone: 'agent', typed: true },
-      { text: '● Write(index.html)', tone: 'muted' },
-    ],
-  },
-  {
-    name: 'tests',
-    lines: [
-      { text: '$ npm test --watch', tone: 'cmd', typed: true },
-      { text: 'PASS chart.test.ts', tone: 'ok' },
-      { text: 'Tests: 18 passed', tone: 'muted' },
-    ],
-  },
-]
-
-const windows: Win[] = [
-  {
-    id: 'bob',
-    title: 'bob@main',
-    typeMs: 34,
-    steps: [{ cmd: 'docker compose up', out: ['Container web  Started', 'Container db   Started'] }],
-  },
-  {
-    id: 'acme',
-    title: 'acme@main',
-    typeMs: 40,
-    steps: [{ cmd: 'npm run dev', out: ['Local: http://localhost:5173', 'ready in 312 ms'] }],
-  },
-  {
-    id: 'you',
-    title: 'you@laptop',
-    typeMs: 28,
-    steps: [
-      { cmd: 'devmachine ssh acme', out: ['acme@main:~$'] },
-      { cmd: 'devmachine sync', out: ['main: ok=12 changed=3 failed=0'] },
-    ],
-  },
-]
+const base = import.meta.env.BASE_URL
+const restText = 'main · 2 workspaces, 1 agent at work'
 ---
 
-<section class="hero" id="hero">
-  <div class="hero-backdrop" aria-hidden="true"></div>
-  <canvas class="hero-grid-bg" id="hero-grid-bg" aria-hidden="true"></canvas>
-  <div class="hero-copy max-w-3xl mx-auto px-4 sm:px-6">
-    <p class="hero-eyebrow text-xs font-mono uppercase tracking-widest text-[var(--muted)] mb-4">
-      <span class="hero-eyebrow-dot" aria-hidden="true"></span>
-      {eyebrow}
-    </p>
-    <h1 class="text-5xl sm:text-7xl font-light leading-[0.95] tracking-tight" style="letter-spacing: -0.03em;">
-      {headline}
-    </h1>
-    <p class="hero-subline text-base sm:text-lg text-[var(--muted)] mt-5 max-w-xl mx-auto">
-      {subline}
-    </p>
-  </div>
+<section class="mh-hero" id="hero" aria-labelledby="hero-title">
+  <div class="frame mh-grid">
+    <div class="mh-copy">
+      <p class="mh-eyebrow">{eyebrow}</p>
+      <h1 id="hero-title" class="mh-title">{headline}</h1>
+      <p class="mh-sub">{subline}</p>
+      <div class="mh-cta">
+        <a class="mh-btn mh-btn-primary" href={`${base}#get-started`}>
+          Get started
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>
+        </a>
+        <a class="mh-btn mh-btn-ghost" href={`${base}getting-started/`}>Documentation</a>
+      </div>
+    </div>
 
-  <p class="sr-only">
-    Illustration: terminals for you, two workspaces and a coding agent, and the Mac app, all linked to one server.
-  </p>
-  <div class="hero-terminal-wrap px-4 sm:px-6" id="hero-terminal">
-    <div class="hero-stage">
-      <svg
-        class="hero-link-svg"
-        id="hero-link-svg"
-        viewBox="0 0 1280 740"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <g class="hero-link-lines" fill="none" stroke-width="1.5">
-          <path id="hero-link-you" class="hero-link-line" d="M 640 370 L 588.8 430"></path>
-          <path id="hero-link-acme" class="hero-link-line" d="M 640 370 L 588.8 310"></path>
-          <path id="hero-link-bob" class="hero-link-line" d="M 640 370 L 691.2 310"></path>
-          <path id="hero-link-agent" class="hero-link-line" d="M 640 370 L 691.2 430"></path>
-          <path id="hero-link-mac" class="hero-link-line" d="M 640 370 L 640 200"></path>
-        </g>
-        <circle id="hero-packet-you" class="hero-packet" r="3"></circle>
-        <circle id="hero-packet-acme" class="hero-packet" r="3"></circle>
-        <circle id="hero-packet-bob" class="hero-packet" r="3"></circle>
-        <circle id="hero-packet-agent" class="hero-packet" r="3"></circle>
-        <circle id="hero-packet-mac" class="hero-packet" r="3"></circle>
-      </svg>
-      <div class="hero-hub" aria-hidden="true">
-        <svg width="82" height="82" viewBox="3.2 3.2 25.6 25.6">
-          <defs>
-            <linearGradient id="hero-hub-icon-gradient" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-              <stop offset="0" stop-color="#0f172a" />
-              <stop offset="1" stop-color="#1e1b4b" />
-            </linearGradient>
-          </defs>
-          <rect x="3.2" y="3.2" width="25.6" height="25.6" rx="5.6" fill="url(#hero-hub-icon-gradient)" />
-          <path
-            d="M 11.6 9.8 L 18.4 16 L 11.6 22.2"
-            fill="none"
-            stroke="#28c840"
-            stroke-width="2.9"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-          <rect x="20.2" y="18.9" width="5.4" height="2" rx="0.4" fill="#5aa9e6" />
-        </svg>
-      </div>
-      {
-        windows.map((win) => (
-          <div class={`term-window term-${win.id}`} data-window={win.id}>
-            <div class="terminal" aria-hidden="true">
-              <div class="terminal-titlebar">
-                <span class="terminal-dot" />
-                <span class="terminal-dot" />
-                <span class="terminal-dot" />
-                <span class="terminal-title font-mono">{win.title}</span>
-              </div>
-              <div class="terminal-body font-mono" id={`term-body-${win.id}`}>
-                <div class="term-line">
-                  <span class="term-prompt">$</span>
-                  <span class="term-cmd">{win.steps[0].cmd}</span>
-                </div>
-                {win.steps[0].out.map((line) => (
-                  <div class="term-line term-out">{line}</div>
-                ))}
-              </div>
-            </div>
-          </div>
-        ))
-      }
-      <div class="term-window term-agent" data-window="agent">
-        <div class="terminal" aria-hidden="true">
-          <div class="terminal-titlebar">
-            <span class="terminal-dot" />
-            <span class="terminal-dot" />
-            <span class="terminal-dot" />
-            <span class="terminal-title font-mono">agent@main</span>
-          </div>
-          <div class="terminal-body font-mono" id="term-body-agent">
-            <div class="term-line term-agent-welcome">✻ agent@main · ~/app</div>
-          </div>
-        </div>
-      </div>
-      <div class="term-window term-mac" data-window="mac">
-        <button
-          type="button"
-          id="hero-motion"
-          class="hero-motion-toggle"
-          aria-label="Pause animation"
-          aria-pressed="false"
-          title="Pause animation"
-        >
-          <svg class="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" /><rect x="14" y="5" width="4" height="14" /></svg>
-          <svg class="icon-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
-        </button>
-        <div class="mac-window" aria-hidden="true">
-          <aside class="mac-sidebar">
-            <div class="mac-lights">
-              <span class="mac-light mac-light-close" />
-              <span class="mac-light mac-light-min" />
-              <span class="mac-light mac-light-max" />
-            </div>
-            <p class="mac-section">Workspaces</p>
-            <p class="mac-ws"><span class="mac-chevron">›</span><span class="mac-ws-dot" />acme</p>
-            <p class="mac-row mac-row-active"><span class="mac-glyph">&gt;_</span><span class="mac-row-text">claude — payments refactor</span></p>
-            <p class="mac-row"><span class="mac-glyph">&gt;_</span><span class="mac-row-text">codex — landing page</span></p>
-            <p class="mac-ws"><span class="mac-chevron">›</span><span class="mac-ws-dot" />globex</p>
-            <p class="mac-row"><span class="mac-glyph">&gt;_</span><span class="mac-row-text">dashboard — tests</span></p>
-            <p class="mac-section">Local</p>
-            <p class="mac-row mac-row-operator"><span class="mac-glyph mac-glyph-operator">◆</span><span class="mac-row-text">Operator</span></p>
-          </aside>
-          <div class="mac-main">
-            <header class="mac-toolbar">
-              <span class="mac-title">Devmachine</span>
-              <span class="mac-crumb">acme · payments refactor</span>
-            </header>
-            <div class="mac-panes font-mono">
-              {
-                macPanes.map((pane, p) => (
-                  <div class={`mac-pane${p === 0 ? ' mac-pane-focus' : ''}`}>
-                    <div class="mac-pane-head">{pane.name}</div>
-                    <div class="mac-pane-body">
-                      {pane.lines.map((line, i) => (
-                        <div
-                          class={`mac-line mac-line-${line.tone}${line.typed ? ' mac-line-typed' : ''}`}
-                          style={`--delay: ${(p * 0.45 + i * 0.7).toFixed(2)}s`}
-                        >
-                          {line.text}
-                        </div>
-                      ))}
-                      <span class="mac-cursor" style={`--delay: ${(p * 0.45 + pane.lines.length * 0.7).toFixed(2)}s`} />
-                    </div>
-                  </div>
-                ))
-              }
-            </div>
-            <footer class="mac-status">
-              <span>Todos</span>
-              <span class="mac-progress"><i /></span>
-              <span>3/5</span>
-              <span class="mac-status-host">acme · main</span>
-            </footer>
-          </div>
-        </div>
-      </div>
+    <div class="mh-scene">
+      <div id="ws-figure" data-rest={restText}></div>
+      <button type="button" class="mh-motion" id="mh-motion" aria-pressed="false" aria-label="Pause animation" title="Pause animation">
+        <svg class="mh-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14"></rect><rect x="14" y="5" width="4" height="14"></rect></svg>
+        <svg class="mh-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>
+      </button>
+      <p class="mh-readout" aria-live="polite"><i aria-hidden="true"></i><span id="ws-read">{restText}</span></p>
     </div>
   </div>
 </section>
 
-<script is:inline define:vars={{ windows }}>
-  ;(() => {
-    const section = document.getElementById('hero')
-    if (!(section instanceof HTMLElement)) return
+<script>
+  import { HL } from '../lib/hairline.js'
 
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reduceMotion) return
+  const {
+    Cam, circ, facing, fit, open, poly, proj, prism, put, rings, rrect, solid,
+    spring, stepS, unproj, disposer, mk, place, pointer, register,
+  } = HL
 
-    let visible = true
-    let paused = false
-    let generation = 0
+  const NODES = [
+    { id: 'phone', x: -78, y: -22, s: 15, mark: 'phone', name: 'your phone' },
+    { id: 'domain', x: 6, y: -96, s: 15, mark: 'globe', name: 'acme.example.com' },
+    { id: 'laptop', x: -54, y: 58, s: 15, mark: 'laptop', name: 'you@laptop' },
+    { id: 'main', x: 0, y: 0, s: 22, mark: 'prompt', name: 'main · your server' },
+    { id: 'acme', x: 66, y: -54, s: 15, mark: 'window', name: 'acme · workspace' },
+    { id: 'globex', x: 44, y: 66, s: 15, mark: 'window', name: 'globex · workspace' },
+    { id: 'claude', x: 104, y: 8, s: 15, mark: 'agent', name: 'claude · at work in acme' },
+  ]
+  const EDGES = [
+    ['laptop', 'main', 2.6, 0], ['phone', 'main', 3.1, 0.4], ['main', 'acme', 2.4, 0.2],
+    ['acme', 'claude', 2.0, 0.6], ['main', 'globex', 2.9, 0.75], ['acme', 'domain', 2.7, 0.1],
+  ]
+  const BASE = 8, TIER = 6, LIFT = 7
 
-    const MAX_LINES = 5
+  const MARKS = {
+    prompt: [[[-4.5, -5], [0.5, 0], [-4.5, 5]], [[2.5, 4], [7.5, 4]]],
+    laptop: [rrect(-5, -4, 5, 2, 1, 2).map((q) => [q.u, q.v]).concat([[-5, -4]]), [[-6.5, 4], [6.5, 4]]],
+    phone: [rrect(-3.2, -5.5, 3.2, 5.5, 1.4, 2).map((q) => [q.u, q.v]).concat([[-3.2, -3]]), [[-1, 3.8], [1, 3.8]]],
+    window: [rrect(-6, -4.5, 6, 4.5, 1.2, 2).map((q) => [q.u, q.v]).concat([[-6, -2]]), [[-6, -1.8], [6, -1.8]], [[-4, 1.2], [2, 1.2]]],
+    agent: [0, 45, 90, 135].map((a) => {
+      const r = (a * Math.PI) / 180
+      return [[-5 * Math.cos(r), -5 * Math.sin(r)], [5 * Math.cos(r), 5 * Math.sin(r)]]
+    }),
+    globe: [circ(5, 16).map((q) => [q.u, q.v]), circ(5, 16).map((q) => [q.u * 0.42, q.v]), [[-5, 0], [5, 0]]],
+  }
 
-    function sleep(ms) {
-      return new Promise((resolve) => setTimeout(resolve, ms))
-    }
+  function mount({ stage, svg, read }, value) {
+    const bag = disposer()
+    let speed = value, clock = 0
+    const nodes = NODES.map((n) => ({ ...n }))
+    const by = Object.fromEntries(nodes.map((n) => [n.id, n]))
 
-    async function waitWhilePaused(gen) {
-      while ((paused || document.hidden || section.hasAttribute('data-paused')) && gen === generation) {
-        await sleep(150)
-      }
-    }
+    const C = Cam(45, 0.5, 1.72)
+    const ext = nodes.flatMap((n) => [[n.x - n.s, n.y - n.s, 0], [n.x + n.s, n.y + n.s, 0], [n.x - n.s, n.y - n.s, BASE + TIER + LIFT]])
+    fit(C, ext, 200, 168)
+    const P = proj(C), front = facing(C)
+    const g = mk('g', {}, svg)
 
-    function makeCursor() {
-      const cursor = document.createElement('span')
-      cursor.className = 'term-cursor'
-      return cursor
-    }
-
-    function trimLines(body) {
-      while (body.children.length > MAX_LINES) {
-        body.removeChild(body.firstElementChild)
-      }
-    }
-
-    async function typeCommand(gen, body, text, typeMs) {
-      const line = document.createElement('div')
-      line.className = 'term-line'
-      const prompt = document.createElement('span')
-      prompt.className = 'term-prompt'
-      prompt.textContent = '$'
-      const cmd = document.createElement('span')
-      cmd.className = 'term-cmd'
-      line.appendChild(prompt)
-      line.appendChild(cmd)
-      const cursor = makeCursor()
-      line.appendChild(cursor)
-      body.appendChild(line)
-      trimLines(body)
-
-      for (const ch of text) {
-        if (gen !== generation) return
-        await waitWhilePaused(gen)
-        if (gen !== generation) return
-        cmd.textContent += ch
-        await sleep(typeMs * 0.6 + Math.random() * typeMs * 0.5)
-      }
-      cursor.remove()
-    }
-
-    async function showOutputLine(gen, body, text) {
-      if (gen !== generation) return
-      await waitWhilePaused(gen)
-      if (gen !== generation) return
-      const line = document.createElement('div')
-      line.className = 'term-line term-out'
-      line.textContent = text
-      body.appendChild(line)
-      trimLines(body)
-      await sleep(200)
-    }
-
-    async function runWindowLoop(gen, win) {
-      const body = document.getElementById(`term-body-${win.id}`)
-      if (!(body instanceof HTMLElement)) return
-      while (gen === generation) {
-        body.innerHTML = ''
-        for (const step of win.steps) {
-          if (gen !== generation) return
-          await waitWhilePaused(gen)
-          if (gen !== generation) return
-          await typeCommand(gen, body, step.cmd, win.typeMs)
-          await sleep(240)
-          for (const line of step.out) {
-            await showOutputLine(gen, body, line)
-          }
-          await sleep(500 + Math.random() * 400)
-        }
-        const cursor = makeCursor()
-        body.appendChild(cursor)
-        trimLines(body)
-        await sleep(2400 + Math.random() * 800)
-      }
-    }
-
-    function start() {
-      if (!visible || document.hidden) return
-      paused = false
-    }
-
-    function stop() {
-      paused = true
-    }
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        visible = entries[0]?.isIntersecting ?? true
-        if (visible) start()
-        else stop()
-      },
-      { threshold: 0 },
-    )
-    io.observe(section)
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) stop()
-      else start()
+    const routes = EDGES.map(([a, b, dur, ph]) => {
+      const A = by[a], Bn = by[b], pts = [[A.x, A.y], [A.x, Bn.y], [Bn.x, Bn.y]]
+      const lens = [Math.abs(Bn.y - A.y), Math.abs(Bn.x - A.x)], total = lens[0] + lens[1]
+      mk('path', { d: open(pts.map(([x, y]) => P(x, y, 0))), class: 'nf lo trace' }, g)
+      return { a, b, pts, lens, total, dur, ph, last: ph }
     })
 
-    generation = 1
-    for (const win of windows) {
-      runWindowLoop(1, win)
+    const ux = P(1, 0, 0), uy = P(0, 1, 0), o = P(0, 0, 0)
+    const onGround = (x, y, txt, cls) => {
+      const at = P(x, y, 0)
+      const t = mk('text', { class: cls, transform: `matrix(${ux[0] - o[0]},${ux[1] - o[1]},${uy[0] - o[0]},${uy[1] - o[1]},${at[0]},${at[1]})` }, g)
+      t.textContent = txt
     }
-  })()
-</script>
+    onGround(-54, 22, 'ssh', 'board-tag')
+    onGround(66, -82, 'https', 'board-tag')
 
-<script is:inline>
-  ;(() => {
-    const hero = document.getElementById('hero')
-    const toggle = document.getElementById('hero-motion')
-    if (!hero || !toggle) return
-    toggle.addEventListener('click', () => {
-      const paused = !hero.hasAttribute('data-paused')
-      hero.toggleAttribute('data-paused', paused)
-      toggle.setAttribute('aria-pressed', String(paused))
-      toggle.title = paused ? 'Play animation' : 'Pause animation'
-      hero.dispatchEvent(new Event('hero-motion'))
-    })
-  })()
-</script>
+    const packets = routes.map(() => mk('circle', { r: 2.3, class: 'dot packet' }, g))
 
-<script is:inline>
-  ;(() => {
-    const section = document.getElementById('hero')
-    const stage = document.querySelector('.hero-stage')
-    const svg = document.getElementById('hero-link-svg')
-    if (!(section instanceof HTMLElement) || !(stage instanceof HTMLElement) || !svg) return
-
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const desktopQuery = window.matchMedia('(min-width: 901px)')
-
-    const VIEW_W = 1280
-    const VIEW_H = 740
-    const HUB = { x: VIEW_W / 2, y: VIEW_H / 2 }
-
-    // An underdamped spring: the window overshoots a little and settles,
-    // which is what makes the release read as elastic.
-    const STIFFNESS = 220
-    const DAMPING = 15
-
-    const keys = ['you', 'acme', 'bob', 'agent', 'mac']
-    const links = {}
-    for (const key of keys) {
-      const win = stage.querySelector(`[data-window="${key}"]`)
-      const path = document.getElementById(`hero-link-${key}`)
-      const packet = document.getElementById(`hero-packet-${key}`)
-      if (!(win instanceof HTMLElement) || !(path instanceof SVGPathElement) || !packet) continue
-      links[key] = { win, path, packet, x: 0, y: 0, vx: 0, vy: 0, dragging: false }
+    const order = nodes.slice().sort((p, q) => p.x + p.y - (q.x + q.y))
+    for (const n of order) {
+      n.g = mk('g', {}, g)
+      n.base = solid(n.g)
+      n.tier = solid(n.g)
+      n.coin = mk('path', { class: 'coin' }, n.g)
+      n.markEl = mk('path', { class: 'nf mark' + (n.id === 'main' ? ' brand' : '') }, n.g)
+      n.lift = spring(0)
+      n.flash = 0
+      n.drawn = NaN
     }
 
-    function place(link) {
-      link.win.style.translate = link.x || link.y ? `${link.x}px ${link.y}px` : ''
+    function draw(n) {
+      const z = n.lift.x, s = n.s, top = BASE + TIER + z, k = s / 15
+      const [r0, r0i] = rings(n.x - s, n.y - s, n.x + s, n.y + s, 6 * k, 1.6)
+      const [r1, r1i] = rings(n.x - s + 4, n.y - s + 4, n.x + s - 4, n.y + s - 4, 4.5 * k, 1.4)
+      put(n.base, prism(P, front, r0, r0i, z, BASE + z))
+      put(n.tier, prism(P, front, r1, r1i, BASE + z, top))
+      n.coin.setAttribute('d', poly(circ(8.2 * k, 24).map((q) => P(n.x + q.u, n.y + q.v, top + 0.2))))
+      const sc = 0.95 * k
+      n.markEl.setAttribute('d', MARKS[n.mark].map((line) => open(line.map(([u, v]) => P(n.x + u * sc, n.y + v * sc, top + 0.3)))).join(''))
+      n.drawn = z
     }
 
-    // The line ends at the point of the window nearest the hub, so it stays
-    // attached from any side while the window moves around it.
-    function updateLines() {
-      const box = stage.getBoundingClientRect()
-      if (!box.width || !box.height) return
-      const hubX = box.left + box.width / 2
-      const hubY = box.top + box.height / 2
-      for (const key of keys) {
-        const link = links[key]
-        if (!link) continue
-        const r = link.win.getBoundingClientRect()
-        const px = Math.min(Math.max(hubX, r.left), r.right)
-        const py = Math.min(Math.max(hubY, r.top), r.bottom)
-        const x = ((px - box.left) / box.width) * VIEW_W
-        const y = ((py - box.top) / box.height) * VIEW_H
-        link.path.setAttribute('d', `M ${HUB.x} ${HUB.y} L ${x.toFixed(1)} ${y.toFixed(1)}`)
-      }
-    }
-
-    const cyclePeriod = 6000
-    const travelDuration = 1100
-    const phase = { you: 0, acme: 900, bob: 1800, agent: 2700, mac: 3600 }
-
-    function movePackets(time) {
-      for (const key of keys) {
-        const link = links[key]
-        if (!link) continue
-        const local = (time + phase[key]) % cyclePeriod
-        if (local >= travelDuration) {
-          link.packet.setAttribute('opacity', '0')
-          continue
-        }
-        const cycleIndex = Math.floor((time + phase[key]) / cyclePeriod)
-        const outward = cycleIndex % 2 === 0
-        const t = local / travelDuration
-        const length = link.path.getTotalLength()
-        const pos = link.path.getPointAtLength((outward ? t : 1 - t) * length)
-        link.packet.setAttribute('cx', String(pos.x))
-        link.packet.setAttribute('cy', String(pos.y))
-        link.packet.setAttribute('opacity', String(Math.sin(Math.PI * t)))
-      }
-    }
-
-    function stepSprings(dt) {
-      let moving = false
-      for (const key of keys) {
-        const link = links[key]
-        if (!link || link.dragging) continue
-        if (!link.x && !link.y && !link.vx && !link.vy) continue
-        link.vx += (-STIFFNESS * link.x - DAMPING * link.vx) * dt
-        link.vy += (-STIFFNESS * link.y - DAMPING * link.vy) * dt
-        link.x += link.vx * dt
-        link.y += link.vy * dt
-        if (Math.hypot(link.x, link.y) < 0.3 && Math.hypot(link.vx, link.vy) < 3) {
-          link.x = link.y = link.vx = link.vy = 0
-        } else {
-          moving = true
-        }
-        place(link)
-      }
-      return moving
-    }
-
-    let visible = true
-    let rafId = null
-    let lastTime = 0
-
-    function tick(time) {
-      const dt = Math.min(lastTime ? (time - lastTime) / 1000 : 1 / 60, 1 / 30)
-      lastTime = time
-      const springing = stepSprings(dt)
-      updateLines()
-      if (!reduceMotion) movePackets(time)
-      const dragging = keys.some((key) => links[key]?.dragging)
-      const animating = !reduceMotion && visible && !document.hidden && !section.hasAttribute('data-paused')
-      if (animating || springing || dragging) {
-        rafId = requestAnimationFrame(tick)
-      } else {
-        rafId = null
-      }
-    }
-
-    function wake() {
-      if (rafId == null) {
-        lastTime = 0
-        rafId = requestAnimationFrame(tick)
-      }
-    }
-
-    for (const key of keys) {
-      const link = links[key]
-      if (!link) continue
-      let startX = 0
-      let startY = 0
-
-      link.win.addEventListener('pointerdown', (e) => {
-        if (!desktopQuery.matches || e.button !== 0 || e.target.closest('button')) return
-        link.dragging = true
-        link.vx = link.vy = 0
-        startX = e.clientX - link.x
-        startY = e.clientY - link.y
-        link.win.setPointerCapture(e.pointerId)
-        link.win.classList.add('is-dragging')
-        e.preventDefault()
-        wake()
+    let hover = null, paused = false
+    const B = register(stage, (dt) => {
+      if (!paused) clock += dt * speed
+      routes.forEach((rt, i) => {
+        const f = (clock / rt.dur + rt.ph) % 1
+        if (f < rt.last) by[rt.b].flash = 0.5
+        rt.last = f
+        const d = f * rt.total
+        const p = d <= rt.lens[0]
+          ? [rt.pts[0][0], rt.pts[0][1] + Math.sign(rt.pts[1][1] - rt.pts[0][1]) * d]
+          : [rt.pts[1][0] + Math.sign(rt.pts[2][0] - rt.pts[1][0]) * (d - rt.lens[0]), rt.pts[1][1]]
+        place(packets[i], P(p[0], p[1], 0))
       })
-
-      link.win.addEventListener('pointermove', (e) => {
-        if (!link.dragging) return
-        link.x = e.clientX - startX
-        link.y = e.clientY - startY
-        place(link)
-      })
-
-      const release = () => {
-        if (!link.dragging) return
-        link.dragging = false
-        link.win.classList.remove('is-dragging')
-        if (reduceMotion) {
-          link.x = link.y = 0
-          place(link)
-        }
-        wake()
+      for (const n of nodes) {
+        stepS(n.lift, dt)
+        if (n.lift.x !== n.drawn) draw(n)
+        n.flash = Math.max(0, n.flash - dt)
+        n.tier.sil.classList.toggle('hi', n.flash > 0 || n === hover)
       }
-      link.win.addEventListener('pointerup', release)
-      link.win.addEventListener('pointercancel', release)
-      link.win.addEventListener('lostpointercapture', release)
+      return !paused || nodes.some((n) => n.lift.x !== n.lift.t || n.flash > 0)
+    })
+    bag.add(B.unregister)
+    nodes.forEach(draw)
+
+    function move([sx, sy]) {
+      const [x, y] = unproj(C, sx, sy, 0)
+      let pick = null
+      for (const n of nodes) if (Math.abs(x - n.x) <= n.s + 4 && Math.abs(y - n.y) <= n.s + 4) pick = n
+      if (pick === hover) return
+      if (hover) hover.lift.t = 0
+      hover = pick
+      if (hover) hover.lift.t = LIFT
+      read(hover ? hover.name : null)
+      B.wake()
     }
-
-    section.addEventListener('hero-motion', wake)
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        visible = entries[0]?.isIntersecting ?? true
-        if (visible) wake()
+    const leave = () => {
+      if (hover) hover.lift.t = 0
+      hover = null
+      read(null)
+      B.wake()
+    }
+    bag.add(pointer(stage, { move, leave }))
+    bag.add(() => svg.replaceChildren())
+    return {
+      setPaused: (p) => {
+        paused = p
+        B.wake()
       },
-      { threshold: 0 },
-    )
-    io.observe(section)
+      destroy: bag.dispose,
+    }
+  }
 
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) wake()
-    })
-    window.addEventListener('resize', () => {
-      updateLines()
-      wake()
-    })
+  const stage = document.getElementById('ws-figure')
+  const out = document.getElementById('ws-read')
+  const button = document.getElementById('mh-motion')
+  if (stage && out && button) {
+    HL.inject(document)
+    const restText = stage.dataset.rest ?? ''
+    stage.setAttribute('data-hairline', 'mesh')
+    stage.setAttribute('role', 'img')
+    stage.setAttribute('aria-label', 'Your machine in the middle of everything you code from, with work moving between them all the time.')
+    const svg = HL.mk('svg', { viewBox: '0 0 400 320', 'aria-hidden': 'true' }, stage)
+    const figure = mount({ stage, svg, read: (text) => { out.textContent = text ?? restText } }, 1)
 
-    updateLines()
-    wake()
-  })()
+    const setPaused = (p) => {
+      const label = p ? 'Play animation' : 'Pause animation'
+      button.setAttribute('aria-pressed', String(p))
+      button.setAttribute('aria-label', label)
+      button.title = label
+      figure.setPaused(p)
+    }
+    button.addEventListener('click', () => setPaused(button.getAttribute('aria-pressed') !== 'true'))
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)')
+    if (reduce.matches) setPaused(true)
+    reduce.addEventListener('change', (e) => setPaused(e.matches))
+  }
 </script>
 
-<script is:inline>
-  ;(() => {
-    const section = document.getElementById('hero')
-    const body = document.getElementById('term-body-agent')
-    if (!(section instanceof HTMLElement) || !(body instanceof HTMLElement)) return
+<style is:global>
+  .mh-hero {
+    --mh-grid-line: rgb(15 20 26 / 0.07);
+    --mh-trace: #c4c5c0;
+    --mh-coin: #0f141a;
+    --mh-mark: #f5f5f2;
+    --mh-tag: #8a8d94;
+    --mh-readout: #3a3f47;
+    --mh-primary-hover: #262c34;
+    --hairline-plate: var(--bg);
+    --hairline-hi: #0f141a;
+    --hairline-edge: #3d424a;
+    --hairline-mid: #8a8d94;
+    --hairline-lo: #d3d3cf;
+    --hairline-stroke: 0.9;
+    --mh-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reduceMotion) return
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: min(100svh, 860px);
+    display: flex;
+    align-items: center;
+    padding: 112px 0 72px;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    let visible = true
-    let paused = false
-    let generation = 0
+  :root[data-theme='dark'] .mh-hero {
+    --mh-grid-line: rgb(255 255 255 / 0.07);
+    --mh-trace: #34353a;
+    --mh-coin: #f5f5f2;
+    --mh-mark: #050505;
+    --mh-tag: #8a8d94;
+    --mh-readout: #c9cbd0;
+    --mh-primary-hover: #d9d9d4;
+    --hairline-hi: #f5f5f2;
+    --hairline-edge: #a4a6ad;
+    --hairline-mid: #5b5d64;
+    --hairline-lo: #2c2d31;
+  }
 
-    const MAX_LINES = 9
-    const SPINNER_FRAMES = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
-
-    function sleep(ms) {
-      return new Promise((resolve) => setTimeout(resolve, ms))
-    }
-
-    async function waitWhilePaused(gen) {
-      while ((paused || document.hidden || section.hasAttribute('data-paused')) && gen === generation) {
-        await sleep(150)
-      }
-    }
-
-    function trimLines() {
-      while (body.children.length > MAX_LINES) {
-        body.removeChild(body.firstElementChild)
-      }
-    }
-
-    function appendLine(text, className) {
-      const line = document.createElement('div')
-      line.className = `term-line ${className}`
-      line.textContent = text
-      body.appendChild(line)
-      trimLines()
-      return line
-    }
-
-    async function typePrompt(gen, text) {
-      const line = document.createElement('div')
-      line.className = 'term-line term-agent-prompt'
-      const marker = document.createElement('span')
-      marker.className = 'term-agent-marker'
-      marker.textContent = '>'
-      const cmd = document.createElement('span')
-      cmd.className = 'term-agent-prompt-text'
-      line.appendChild(marker)
-      line.appendChild(document.createTextNode(' '))
-      line.appendChild(cmd)
-      const cursor = document.createElement('span')
-      cursor.className = 'term-cursor'
-      line.appendChild(cursor)
-      body.appendChild(line)
-      trimLines()
-
-      for (const ch of text) {
-        if (gen !== generation) return
-        await waitWhilePaused(gen)
-        if (gen !== generation) return
-        cmd.textContent += ch
-        await sleep(20 + Math.random() * 20)
-      }
-      cursor.remove()
-    }
-
-    async function showThinking(gen, duration) {
-      if (gen !== generation) return
-      await waitWhilePaused(gen)
-      if (gen !== generation) return
-      const line = appendLine(`${SPINNER_FRAMES[0]} Thinking…`, 'term-agent-thinking')
-      const start = Date.now()
-      let i = 0
-      while (Date.now() - start < duration) {
-        if (gen !== generation) return
-        await sleep(90)
-        i = (i + 1) % SPINNER_FRAMES.length
-        line.textContent = `${SPINNER_FRAMES[i]} Thinking…`
-      }
-      line.remove()
-    }
-
-    async function runAgentLoop(gen) {
-      while (gen === generation) {
-        body.innerHTML = ''
-        appendLine('✻ agent@main · ~/app', 'term-agent-welcome')
-        await sleep(400)
-        if (gen !== generation) return
-        await waitWhilePaused(gen)
-        await typePrompt(gen, 'add a health check endpoint')
-        await sleep(300)
-
-        await showThinking(gen, 700)
-        appendLine('● Read(src/server.ts)', 'term-agent-tool')
-        await sleep(500)
-
-        await showThinking(gen, 700)
-        appendLine('● Edit(src/server.ts)', 'term-agent-tool')
-        await sleep(250)
-        appendLine("+  app.get('/health', (_req, res) => res.send('ok'))", 'term-agent-diff-add')
-        await sleep(200)
-        appendLine('-  // TODO: add a health check', 'term-agent-diff-del')
-        await sleep(500)
-
-        await showThinking(gen, 700)
-        appendLine('● Bash(npm test)', 'term-agent-tool')
-        await sleep(500)
-        appendLine('✓ 12 passed', 'term-agent-result')
-        await sleep(400)
-
-        appendLine('Added GET /health and a test.', 'term-agent-reply')
-        const cursor = document.createElement('span')
-        cursor.className = 'term-cursor'
-        body.appendChild(cursor)
-        trimLines()
-        await sleep(2600 + Math.random() * 800)
-      }
-    }
-
-    function start() {
-      if (!visible || document.hidden) return
-      paused = false
-    }
-
-    function stop() {
-      paused = true
-    }
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        visible = entries[0]?.isIntersecting ?? true
-        if (visible) start()
-        else stop()
-      },
-      { threshold: 0 },
-    )
-    io.observe(section)
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) stop()
-      else start()
-    })
-
-    generation = 1
-    runAgentLoop(1)
-  })()
-</script>
-
-<script is:inline>
-  ;(() => {
-    const hero = document.getElementById('hero')
-    const stage = document.querySelector('.hero-stage')
-    const canvas = document.getElementById('hero-grid-bg')
-    if (!(hero instanceof HTMLElement) || !(stage instanceof HTMLElement) || !(canvas instanceof HTMLCanvasElement)) return
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const CELL = 40
-    const PULSE_EVERY = 4500
-    const PULSE_LIFE = 9500
-    const BAND = 120
-
-    let w = 0
-    let h = 0
-    let cx = 0
-    let cy = 0
-    let dpr = 1
-    let colors = null
-    let base = null
-    let dots = []
-    let visible = true
-    let frame = 0
-
-    function readColors() {
-      const style = getComputedStyle(document.documentElement)
-      const read = (name, fallback) => style.getPropertyValue(name).trim() || fallback
-      return {
-        line: read('--hero-line-rgb', '15, 20, 26'),
-        lineAlpha: parseFloat(read('--hero-line-alpha', '0.1')),
-        accent: read('--hero-accent-rgb', '37, 99, 235'),
-        accentAlpha: parseFloat(read('--hero-accent-alpha', '0.5')),
-      }
-    }
-
-    function fade(x, y) {
-      const dx = (x - cx) / (w * 0.6)
-      const dy = (y - cy) / (h * 0.6)
-      return Math.max(0, 1 - Math.hypot(dx, dy))
-    }
-
-    function buildBase() {
-      base = document.createElement('canvas')
-      base.width = canvas.width
-      base.height = canvas.height
-      const b = base.getContext('2d')
-      b.setTransform(dpr, 0, 0, dpr, 0, 0)
-      const { line, lineAlpha, accent } = colors
-
-      const glow = b.createRadialGradient(cx, cy, 0, cx, cy, Math.min(w, h) * 0.45)
-      glow.addColorStop(0, `rgba(${accent}, ${lineAlpha * 1.6})`)
-      glow.addColorStop(1, `rgba(${accent}, 0)`)
-      b.fillStyle = glow
-      b.fillRect(0, 0, w, h)
-
-      const ox = cx % CELL
-      const oy = cy % CELL
-      b.lineWidth = 1
-      for (let x = ox; x <= w; x += CELL) {
-        const g = b.createLinearGradient(x, 0, x, h)
-        g.addColorStop(0, `rgba(${line}, 0)`)
-        g.addColorStop(0.5, `rgba(${line}, ${lineAlpha * fade(x, cy)})`)
-        g.addColorStop(1, `rgba(${line}, 0)`)
-        b.strokeStyle = g
-        b.beginPath()
-        b.moveTo(Math.round(x) + 0.5, 0)
-        b.lineTo(Math.round(x) + 0.5, h)
-        b.stroke()
-      }
-      for (let y = oy; y <= h; y += CELL) {
-        const g = b.createLinearGradient(0, y, w, y)
-        g.addColorStop(0, `rgba(${line}, 0)`)
-        g.addColorStop(0.5, `rgba(${line}, ${lineAlpha * fade(cx, y)})`)
-        g.addColorStop(1, `rgba(${line}, 0)`)
-        b.strokeStyle = g
-        b.beginPath()
-        b.moveTo(0, Math.round(y) + 0.5)
-        b.lineTo(w, Math.round(y) + 0.5)
-        b.stroke()
-      }
-
-      dots = []
-      for (let x = ox; x <= w; x += CELL) {
-        for (let y = oy; y <= h; y += CELL) {
-          const f = fade(x, y)
-          if (f <= 0) continue
-          dots.push({ x, y, f, d: Math.hypot(x - cx, y - cy) })
-          b.fillStyle = `rgba(${line}, ${Math.min(1, lineAlpha * 2.6 * f)})`
-          b.fillRect(x - 1, y - 1, 2, 2)
-        }
-      }
-
-      const maxR = Math.hypot(w, h) / 2
-      for (let r = 1; r <= 5; r++) {
-        const radius = maxR * 0.17 * r
-        b.strokeStyle = `rgba(${line}, ${lineAlpha * 2 * (1 - r / 6)})`
-        b.setLineDash(r % 2 ? [] : [4, 6])
-        b.beginPath()
-        b.arc(cx, cy, radius, 0, Math.PI * 2)
-        b.stroke()
-      }
-      b.setLineDash([])
-    }
-
-    function resize() {
-      const rect = hero.getBoundingClientRect()
-      const hub = stage.getBoundingClientRect()
-      w = rect.width
-      h = rect.height
-      if (!w || !h) return false
-      cx = hub.left - rect.left + hub.width / 2
-      cy = hub.top - rect.top + hub.height / 2
-      dpr = Math.min(window.devicePixelRatio || 1, 2)
-      canvas.width = Math.max(1, Math.round(w * dpr))
-      canvas.height = Math.max(1, Math.round(h * dpr))
-      colors = readColors()
-      buildBase()
-      return true
-    }
-
-    // The windows are translucent on purpose, for depth; the grid showing
-    // through them would muddy their text, so their footprint stays clear.
-    function clearUnderWindows() {
-      const origin = hero.getBoundingClientRect()
-      for (const win of stage.querySelectorAll('.term-window')) {
-        const box = win.getBoundingClientRect()
-        ctx.clearRect(box.left - origin.left, box.top - origin.top, box.width, box.height)
-      }
-    }
-
-    function draw(now) {
-      const size = hero.getBoundingClientRect()
-      if (size.width !== w || size.height !== h) resize()
-      if (!base) return
-      ctx.setTransform(1, 0, 0, 1, 0, 0)
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      ctx.drawImage(base, 0, 0)
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      if (reduceMotion) {
-        clearUnderWindows()
-        return
-      }
-
-      const maxR = Math.hypot(w, h) / 2
-      const { accent, accentAlpha } = colors
-      const first = Math.floor((now - PULSE_LIFE) / PULSE_EVERY) + 1
-      for (let k = first; k * PULSE_EVERY <= now; k++) {
-        const t = (now - k * PULSE_EVERY) / PULSE_LIFE
-        if (t < 0 || t > 1) continue
-        const radius = 50 + (maxR - 50) * (1 - Math.pow(1 - t, 2))
-        const life = 1 - t
-
-        ctx.strokeStyle = `rgba(${accent}, ${accentAlpha * life})`
-        ctx.lineWidth = 1
-        ctx.beginPath()
-        ctx.arc(cx, cy, radius, 0, Math.PI * 2)
-        ctx.stroke()
-
-        for (const dot of dots) {
-          const near = 1 - Math.abs(dot.d - radius) / BAND
-          if (near <= 0) continue
-          const a = accentAlpha * 1.2 * near * near * life * dot.f
-          ctx.fillStyle = `rgba(${accent}, ${Math.min(1, a)})`
-          const size = 2 + 2 * near
-          ctx.fillRect(dot.x - size / 2, dot.y - size / 2, size, size)
-        }
-      }
-      clearUnderWindows()
-    }
-
-    function loop(now) {
-      frame = 0
-      if (!visible || document.hidden || hero.hasAttribute('data-paused')) return
-      draw(now)
-      frame = requestAnimationFrame(loop)
-    }
-
-    function start() {
-      draw(performance.now())
-      if (reduceMotion || hero.hasAttribute('data-paused')) return
-      if (!frame) frame = requestAnimationFrame(loop)
-    }
-
-    if (resize()) start()
-
-    // Not window resize: a scrollbar appearing after load narrows the hero
-    // without one, and a canvas left at the old width stretches out of line
-    // with the windows it clears.
-    new ResizeObserver(() => {
-      if (resize()) start()
-    }).observe(hero)
-    new MutationObserver(() => {
-      if (resize()) start()
-    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
-    document.addEventListener('visibilitychange', start)
-    hero.addEventListener('hero-motion', start)
-    new IntersectionObserver((entries) => {
-      visible = entries.some((e) => e.isIntersecting)
-      start()
-    }).observe(hero)
-  })()
-</script>
-
-<style>
-  .hero-grid-bg {
+  .mh-hero::before {
+    content: '';
     position: absolute;
     inset: 0;
+    z-index: -1;
+    background:
+      repeating-linear-gradient(150deg, var(--mh-grid-line) 0 1px, transparent 1px 36px),
+      repeating-linear-gradient(30deg, var(--mh-grid-line) 0 1px, transparent 1px 36px);
+    -webkit-mask-image: radial-gradient(60% 75% at 72% 50%, #000 0%, rgb(0 0 0 / 0.35) 55%, transparent 85%);
+    mask-image: radial-gradient(60% 75% at 72% 50%, #000 0%, rgb(0 0 0 / 0.35) 55%, transparent 85%);
+  }
+
+  .mh-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: center;
+    gap: 24px;
+  }
+
+  .mh-copy {
+    max-width: 520px;
+  }
+
+  .mh-eyebrow {
+    margin: 0 0 20px;
+    font-family: var(--mh-mono);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .mh-title {
+    margin: 0;
+    font-size: clamp(52px, 6.6vw, 92px);
+    font-weight: 300;
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+  }
+
+  .mh-sub {
+    margin: 26px 0 0;
+    max-width: 31ch;
+    font-size: 19px;
+    line-height: 1.5;
+    color: var(--muted);
+    text-wrap: pretty;
+  }
+
+  .mh-cta {
+    display: flex;
+    gap: 10px;
+    margin-top: 36px;
+    flex-wrap: wrap;
+  }
+
+  .mh-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: 46px;
+    padding: 0 20px;
+    border: 1px solid var(--ink);
+    font-family: var(--mh-mono);
+    font-size: 12.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+  }
+
+  .mh-btn svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.15s;
+  }
+
+  .mh-btn:hover svg {
+    transform: translateX(2px);
+  }
+
+  .mh-btn-primary {
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .mh-btn-primary:hover {
+    background: var(--mh-primary-hover);
+  }
+
+  .mh-btn-ghost {
+    background: var(--card);
+    border-color: var(--line);
+  }
+
+  .mh-btn-ghost:hover {
+    border-color: var(--ink);
+  }
+
+  .mh-scene {
+    position: relative;
+    width: calc(100% + 64px);
+    margin-right: -64px;
+  }
+
+  #ws-figure {
     width: 100%;
-    height: 100%;
-    z-index: 0;
-    display: none;
-    pointer-events: none;
   }
 
-  @media (min-width: 901px) {
-    .hero-grid-bg {
-      display: block;
-    }
+  #ws-figure svg .trace {
+    stroke: var(--mh-trace);
   }
 
-  .hero-link-svg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    display: none;
+  #ws-figure svg .packet {
+    fill: var(--ink);
   }
 
-  @media (min-width: 901px) {
-    .hero-link-svg {
-      display: block;
-    }
+  #ws-figure svg .coin {
+    fill: var(--mh-coin);
+    stroke: var(--mh-coin);
   }
 
-  .hero-link-line {
-    stroke: var(--muted);
-    opacity: 0.35;
+  #ws-figure svg .mark {
+    stroke: var(--mh-mark);
+    stroke-width: 1.15;
   }
 
-  .hero-hub-box {
-    fill: var(--hero-bg-center);
-    stroke: var(--muted);
+  #ws-figure svg .mark.brand {
+    stroke: #28c840;
     stroke-width: 1.5;
   }
 
-  .hero-hub {
+  #ws-figure svg .board-tag {
+    font-family: var(--mh-mono);
+    font-size: 7px;
+    fill: var(--mh-tag);
+    stroke: none;
+    letter-spacing: 0.06em;
+  }
+
+  .mh-readout {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    z-index: 0;
+    left: 4%;
+    top: 6%;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 28px;
+    padding: 0 11px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    font-family: var(--mh-mono);
+    font-size: 12px;
+    color: var(--mh-readout);
+    box-shadow: 0 1px 2px rgb(15 20 26 / 0.06);
+  }
+
+  .mh-readout i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #23a03c;
+  }
+
+  .mh-motion {
+    position: absolute;
+    right: 64px;
+    bottom: 6%;
+    z-index: 3;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    background: var(--card);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .mh-motion svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  .mh-motion .mh-play {
     display: none;
-    translate: -50% -50%;
-    filter: drop-shadow(0 12px 24px rgb(0 0 0 / 0.35));
   }
 
-  .hero-hub svg {
+  .mh-motion[aria-pressed='true'] .mh-play {
     display: block;
   }
 
-  @media (min-width: 901px) {
-    .hero-hub {
-      display: block;
+  .mh-motion[aria-pressed='true'] .mh-pause {
+    display: none;
+  }
+
+  @media (max-width: 980px) {
+    .mh-scene {
+      width: 100%;
+      margin-right: 0;
+    }
+
+    .mh-motion {
+      right: 0;
+    }
+
+    .mh-hero {
+      min-height: 0;
+      padding-top: 120px;
+    }
+
+    .mh-grid {
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+
+    .mh-copy {
+      max-width: none;
     }
   }
 
-  .hero-packet {
-    fill: #5aa9e6;
-    opacity: 0;
-  }
-
-  @media (min-width: 901px) {
-    .term-window {
-      cursor: grab;
-      touch-action: none;
-      user-select: none;
+  @media (max-width: 560px) {
+    .mh-sub {
+      font-size: 17px;
     }
 
-    .term-window.is-dragging {
-      cursor: grabbing;
-      z-index: 10;
+    .mh-btn {
+      flex: 1;
+      justify-content: center;
+    }
+
+    .mh-readout {
+      font-size: 11px;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .hero-packet {
-      display: none;
-    }
-  }
-
-  .mac-window {
-    container-type: inline-size;
-    display: grid;
-    grid-template-columns: 37% 1fr;
-    aspect-ratio: 4 / 3;
-    overflow: hidden;
-    border-radius: 10px;
-    background: #0b0b0c;
-    box-shadow:
-      0 0 0 1px rgb(0 0 0 / 0.35),
-      inset 0 0 0 1px rgb(255 255 255 / 0.08),
-      var(--window-shadow);
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
-    color: #e7e7e2;
-    text-align: left;
-  }
-
-  .mac-sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15em;
-    min-width: 0;
-    padding: 0.9em 0.6em;
-    background: linear-gradient(180deg, #1b1b1f, #151518);
-    border-right: 1px solid rgb(255 255 255 / 0.07);
-    font-size: clamp(7px, 2.35cqi, 11.5px);
-  }
-
-  .mac-lights {
-    display: flex;
-    gap: 0.5em;
-    margin: 0 0 1.1em 0.25em;
-  }
-
-  .mac-light {
-    width: 1.05em;
-    height: 1.05em;
-    border-radius: 50%;
-    box-shadow: inset 0 0 0 0.5px rgb(0 0 0 / 0.25);
-  }
-
-  .mac-light-close {
-    background: #ff5f57;
-  }
-
-  .mac-light-min {
-    background: #febc2e;
-  }
-
-  .mac-light-max {
-    background: #28c840;
-  }
-
-  .mac-section {
-    margin: 0.5em 0 0.2em 0.5em;
-    font-size: 0.78em;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #7a7a7a;
-  }
-
-  .mac-section:first-of-type {
-    margin-top: 0;
-  }
-
-  .mac-ws,
-  .mac-row {
-    display: flex;
-    align-items: center;
-    gap: 0.45em;
-    min-width: 0;
-    padding: 0.28em 0.5em;
-    border-radius: 5px;
-    white-space: nowrap;
-  }
-
-  .mac-ws {
-    font-weight: 600;
-  }
-
-  .mac-chevron {
-    display: inline-block;
-    width: 0.6em;
-    rotate: 90deg;
-    color: #7a7a7a;
-  }
-
-  .mac-ws-dot {
-    width: 0.5em;
-    height: 0.5em;
-    border-radius: 50%;
-    background: #28c840;
-    box-shadow: 0 0 0.5em rgb(40 200 64 / 0.6);
-  }
-
-  .mac-row {
-    padding-left: 1.55em;
-    color: #b9b9b4;
-    transition: background 0.15s ease;
-  }
-
-  .mac-row:hover {
-    background: rgb(255 255 255 / 0.06);
-  }
-
-  .mac-row-active,
-  .mac-row-active:hover {
-    background: rgb(90 169 230 / 0.26);
-    color: #f5f5f2;
-  }
-
-  .mac-row-operator {
-    padding-left: 0.5em;
-  }
-
-  .mac-glyph {
-    flex: none;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.82em;
-    color: #5aa9e6;
-  }
-
-  .mac-glyph-operator {
-    color: #febc2e;
-  }
-
-  .mac-row-text {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .mac-main {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    font-size: clamp(7px, 2.35cqi, 11.5px);
-  }
-
-  .mac-toolbar {
-    display: flex;
-    align-items: baseline;
-    gap: 0.7em;
-    padding: 0.85em 0.9em 0.7em;
-    border-bottom: 1px solid rgb(255 255 255 / 0.07);
-    white-space: nowrap;
-    overflow: hidden;
-  }
-
-  .mac-title {
-    font-weight: 600;
-  }
-
-  .mac-crumb {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: #7a7a7a;
-  }
-
-  .mac-panes {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 0.45em;
-    min-height: 0;
-    padding: 0.55em;
-    font-size: 0.82em;
-  }
-
-  .mac-pane {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    min-height: 0;
-    overflow: hidden;
-    border: 1px solid rgb(255 255 255 / 0.08);
-    border-radius: 5px;
-    background: #111113;
-  }
-
-  .mac-pane-focus {
-    border-color: rgb(90 169 230 / 0.55);
-  }
-
-  .mac-pane-head {
-    padding: 0.3em 0.6em;
-    border-bottom: 1px solid rgb(255 255 255 / 0.06);
-    font-size: 0.85em;
-    color: #7a7a7a;
-  }
-
-  .mac-pane-body {
-    padding: 0.4em 0.6em;
-    line-height: 1.55;
-  }
-
-  .mac-line {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: clip;
-    animation: mac-line 7s var(--delay, 0s) infinite both;
-  }
-
-  .mac-line-typed {
-    animation-name: mac-typed;
-    animation-timing-function: steps(18, end);
-  }
-
-  .mac-line-cmd {
-    color: #e7e7e2;
-  }
-
-  .mac-line-agent {
-    color: #5aa9e6;
-  }
-
-  .mac-line-ok {
-    color: #28c840;
-  }
-
-  .mac-line-muted {
-    color: #7a7a7a;
-  }
-
-  .mac-cursor {
-    display: inline-block;
-    width: 0.55em;
-    height: 1.05em;
-    vertical-align: -0.2em;
-    background: #28c840;
-    animation:
-      term-blink 1s steps(1) infinite,
-      mac-line 7s var(--delay, 0s) infinite both;
-  }
-
-  .mac-status {
-    display: flex;
-    align-items: center;
-    gap: 0.6em;
-    padding: 0.45em 0.9em 0.6em;
-    border-top: 1px solid rgb(255 255 255 / 0.07);
-    font-size: 0.82em;
-    color: #7a7a7a;
-    white-space: nowrap;
-  }
-
-  .mac-progress {
-    flex: 0 1 7em;
-    height: 0.45em;
-    overflow: hidden;
-    border-radius: 999px;
-    background: rgb(255 255 255 / 0.1);
-  }
-
-  .mac-progress i {
-    display: block;
-    width: 60%;
-    height: 100%;
-    border-radius: inherit;
-    background: #5aa9e6;
-    animation: mac-progress 7s ease-in-out infinite both;
-  }
-
-  .mac-status-host {
-    margin-left: auto;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  @keyframes mac-line {
-    0% {
-      opacity: 0;
-    }
-    6%,
-    86% {
-      opacity: 1;
-    }
-    94%,
-    100% {
-      opacity: 0;
-    }
-  }
-
-  @keyframes mac-typed {
-    0% {
-      opacity: 1;
-      clip-path: inset(0 100% 0 0);
-    }
-    14%,
-    86% {
-      opacity: 1;
-      clip-path: inset(0 0 0 0);
-    }
-    94%,
-    100% {
-      opacity: 0;
-      clip-path: inset(0 0 0 0);
-    }
-  }
-
-  @keyframes mac-progress {
-    0%,
-    20% {
-      width: 40%;
-    }
-    60%,
-    100% {
-      width: 60%;
-    }
-  }
-
-  .hero[data-paused] .mac-line,
-  .hero[data-paused] .mac-cursor,
-  .hero[data-paused] .mac-progress i {
-    animation-play-state: paused;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .mac-line,
-    .mac-cursor,
-    .mac-progress i {
-      animation: none;
+    .mh-btn svg {
+      transition: none;
     }
   }
 </style>
