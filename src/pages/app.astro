@@ -34,8 +34,8 @@ const allSections: Section[] = [
       },
       {
         name: '09-setup-details',
-        alt: 'The details step for a Lima machine named lab: 4 CPUs, 8 GiB of memory and a 40 GiB disk, and a first workspace named acme.',
-        caption: 'Size the machine and name your first workspace.',
+        alt: 'The details step for a Lima machine named lab, located on this Mac: 4 CPUs, 8 GiB of memory and a 40 GiB disk, and a first workspace named acme.',
+        caption: 'Say where it is, size it, and name your first workspace.',
       },
       {
         name: '09-setup-running',
@@ -127,6 +127,28 @@ const allSections: Section[] = [
     ],
   },
   {
+    id: 'network-map',
+    title: 'Your network as the background',
+    body: 'Pick what sits behind Home in Settings → Appearance: a photo, a gradient, or a map of your network, large behind everything or compact beside the cards. The map draws from your machines and sites, so it changes when they do.',
+    shots: [
+      {
+        name: '185-home-network-map-large-fleet',
+        alt: 'The home screen over a large, faint network map: the internet at the top, links down to five machines, laptop, lab, main, staging and homebox, grouped by place, behind the machine and usage cards and the clock.',
+        caption: 'The large map, behind everything on Home.',
+      },
+      {
+        name: '183-appearance-network-map',
+        alt: 'Settings on Appearance: the Background picker with four cards, Photo, Gradient, Network map large and Network map compact, with the large map chosen, above the terminal settings.',
+        caption: 'Photo, gradient, or the map.',
+      },
+      {
+        name: '180-home-network-map',
+        alt: 'The home screen with a compact network map under the clock: the internet linked to laptop, main and staging.',
+        caption: 'The compact map, in the free space.',
+      },
+    ],
+  },
+  {
     id: 'stats',
     title: 'Stats per machine',
     body: 'Pick a machine to see its memory, disk, load and containers, with RAM split by workspace.',
@@ -161,6 +183,72 @@ const allSections: Section[] = [
     ],
   },
   {
+    id: 'machines',
+    title: 'Machines on a map',
+    body: 'Settings → Machines draws your network: the internet, the machine that runs Caddy and the subdomains it serves, ssh from this Mac, tailnet links, and the workspaces on each machine. Machines in one place share a zone. Pick one to check it, sync it, see its addresses and credentials, or change where it is. A Lima machine on your Mac starts, stops and goes away from here too. Add machine asks where the new one lives.',
+    shots: [
+      {
+        name: '161-machines-map-selected',
+        alt: 'Settings on Machines: an isometric map with the internet at the top, sites such as app.acme.example.com routed through main, ssh from the laptop, a tailnet link, and five machines grouped as local, hostinger and home. Below it, main is selected with its address, location, workspaces, subdomains and packages, and Check, Sync and Full sync buttons.',
+        caption: 'Every machine, where it lives and how it connects.',
+      },
+      {
+        name: '162-machines-check',
+        alt: 'The main machine card with devmachine doctor --machine main open: ssh and ansible pass, and one package waits for a sync.',
+        caption: 'Check one machine.',
+      },
+      {
+        name: '169-add-machine-location',
+        alt: 'The Add a machine page on its details step for lab2, a Lima machine, with a "Where is it?" field set to local and choices Local, Hostinger, Home, Office and Other cloud, beside the commands it will run.',
+        caption: 'A new machine says where it lives.',
+      },
+    ],
+  },
+  {
+    id: 'workspaces',
+    title: 'Workspaces by machine',
+    body: 'Every workspace, grouped by the machine it lives on, each with an on/off switch. Turn one off and it leaves the sidebar, and the app stops reaching it; its sessions keep running. Make a new workspace or edit one without leaving Settings. Edit holds its settings and logins; its packages live in Packages.',
+    shots: [
+      {
+        name: '130-workspaces-list',
+        alt: 'Settings on Workspaces: acme, globex and initech under main and umbrella under staging, each with a switch, its packages, a status such as Applied or Waiting for sync, and Edit, Forget and Destroy.',
+        caption: 'Grouped by machine, each one on or off.',
+      },
+      {
+        name: '131-workspaces-new',
+        alt: 'Workspaces › New workspace inside Settings: the name beta, the machine main, and package cards for the foundation, coding agents and developer tools.',
+        caption: 'A new workspace, inside Settings.',
+      },
+      {
+        name: '137-workspaces-edit',
+        alt: 'Workspaces › Edit acme: zsh plugins and theme, a claude-code setting, a custom setting and the claude and glab logins, with a link to its packages.',
+        caption: 'Edit its settings and logins.',
+      },
+    ],
+  },
+  {
+    id: 'packages',
+    title: 'Packages, many places at once',
+    body: 'Browse the catalog, your own local packages, or what is installed. Narrow it down by machine and workspace. Click a row to choose where it goes, or tick several and install or remove them on many places in one go; each machine syncs in the corner. New package opens a local session with a coding agent to write one, and each local package opens its folder in one click.',
+    shots: [
+      {
+        name: '101-packages-selected',
+        alt: 'Settings on Packages: Machine and Workspace menus, Catalog, Local and Installed tabs, and a list of packages such as caddy, docker, nodejs and postgres with where each is installed. postgres is open with main chosen, and nodejs and postgres are ticked, with Install and Remove for both at the bottom.',
+        caption: 'Pick where, then install or remove.',
+      },
+      {
+        name: '102-packages-confirm',
+        alt: 'A dialog asking "Install these packages?": postgres on main, with what is left out and why.',
+        caption: 'It says what it will do first.',
+      },
+      {
+        name: '104-packages-running',
+        alt: 'The Packages list with postgres and tailscale pending install on main and redis pending removal, while a Sync main card in the corner shows its log.',
+        caption: 'The sync runs in the corner.',
+      },
+    ],
+  },
+  {
     id: 'session-defaults',
     title: 'Session defaults',
     body: 'Choose what a new session opens, per workspace: a plain terminal, a coding agent (Claude Code, Codex, Pi, Antigravity CLI, opencode, Kimi Code or Cline), or a command of your own.',
@@ -175,12 +263,29 @@ const allSections: Section[] = [
   {
     id: 'health',
     title: 'Health check',
-    body: 'The same checks as devmachine doctor, for every machine, one click away.',
+    body: 'The same checks as devmachine doctor, for every machine, one click away in Settings → Health check.',
     shots: [
       {
         name: '07-settings-health',
-        alt: 'Settings, a page beside the sidebar, on Advanced: the health check for main and backup, every check passing but a certificate renewal warning.',
+        alt: 'Settings, a page beside the sidebar, on Health check: the checks for main and backup, every one passing but a certificate renewal warning.',
         caption: 'devmachine doctor, in the app.',
+      },
+    ],
+  },
+  {
+    id: 'cli-updates',
+    title: 'CLI updates in the corner',
+    body: 'When a newer devmachine CLI is out, a card in the corner says so, under the app\'s own. Update installs it, Later hides it until the next one, and Details opens Settings → About. Your machines and configuration stay as they are.',
+    shots: [
+      {
+        name: '65-cli-update-toast',
+        alt: 'Two cards in the corner: Devmachine 0.1.7 is available, with Update and Relaunch, and devmachine CLI 0.8.0 is available, with Details, Later and Update.',
+        caption: 'A card for the app, and one for the CLI.',
+      },
+      {
+        name: '60-cli-update-available',
+        alt: 'Settings on About: devmachine CLI 0.8.0 is available, you have 0.7.23, with an Update CLI button and the brew upgrade devmachine command to copy.',
+        caption: 'Details: the version and the command.',
       },
     ],
   },
@@ -216,12 +321,18 @@ const features = [
   { title: 'Grids', body: 'Several sessions of one workspace, side by side.' },
   { title: '⌘K', body: 'Jump to any screen, session, machine or action.' },
   { title: 'A context panel', body: 'Todo, pull requests, links, files and git of each session.' },
-  { title: 'Home, stats and health', body: 'RAM, disk, load, containers and the doctor checks of every machine.' },
+  { title: 'Home, stats and health', body: 'RAM, disk, load, containers and a health check of every machine.' },
+  { title: 'A network map', body: 'Your machines by place, with their sites, links and workspaces.' },
+  { title: 'Map as wallpaper', body: 'A photo, a gradient or your network behind Home.' },
+  { title: 'Packages', body: 'Install or remove on many machines and workspaces at once.' },
+  { title: 'Workspaces', body: 'Grouped by machine, each one on or off with a switch.' },
   { title: 'Sites and DNS', body: 'Publish a port in a few clicks. See the records of each provider.' },
   { title: 'Session defaults', body: 'Terminal, a coding agent or your own command, per workspace.' },
   { title: 'Menu bar', body: 'Pull requests, and Claude Code and Codex usage.' },
   { title: 'Drop or paste files', body: 'Drag files or paste an image into a session. They land on its machine, path typed in.' },
   { title: 'A files view', body: 'Browse and preview the files of a workspace without a session.' },
+  { title: 'CLI updates', body: 'A card in the corner when a new CLI is out.' },
+  { title: 'Lima, from the app', body: 'Start, stop or delete a machine on your Mac.' },
 ]
 
 const cliEquivalents = [
@@ -230,6 +341,7 @@ const cliEquivalents = [
   { what: 'Send a file to a workspace', cmd: 'devmachine upload mockup.png --workspace acme', href: `${base}reference/commands/#upload` },
   { what: 'See machine stats', cmd: 'devmachine stats', href: `${base}reference/commands/#stats` },
   { what: 'Run the health check', cmd: 'devmachine doctor', href: `${base}reference/commands/#doctor` },
+  { what: 'Check one machine', cmd: 'devmachine doctor --machine main', href: `${base}reference/commands/#doctor` },
 ]
 
 const description =
@@ -256,8 +368,8 @@ const jsonLd = [
     <p class="text-xs font-mono uppercase tracking-widest text-[var(--muted)] mb-3">macOS app · optional</p>
     <h1 class="text-4xl sm:text-6xl font-light tracking-tight mb-5">Devmachine for Mac.</h1>
     <p class="text-[var(--muted)] max-w-2xl">
-      Do from one window what you would do with the devmachine CLI: set up a machine, open sessions, publish
-      sites, check health.
+      Do from one window what you would do with the devmachine CLI: set up machines, open sessions, add
+      packages, publish sites, check health.
     </p>
     <p class="text-[var(--muted)] max-w-2xl mt-3">
       You do not need it. The app runs the same CLI on the same configuration folder, so anything you do in one
