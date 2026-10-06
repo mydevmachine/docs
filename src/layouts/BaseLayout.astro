@@ -96,30 +96,34 @@ const ogImage = new URL(`${base}og.png`, Astro.site).href
           devmachine
         </a>
         <div class="flex items-center gap-2">
-          <nav aria-label="Main" class="hidden md:flex items-center gap-1 text-sm">
+          <nav aria-label="Main" class="hidden lg:flex items-center gap-1 text-sm">
             <a href={`${base}#get-started`} class="px-3 py-1.5">Getting started</a>
             <a href={`${base}getting-started/`} class="px-3 py-1.5">Documentation</a>
             <a href={`${base}guides/`} class="px-3 py-1.5">Guides</a>
             <a href={`${base}packages/`} class="px-3 py-1.5">Packages</a>
             <a href={`${base}app/`} class="px-3 py-1.5">App</a>
+            <a href={`${base}supported-systems/`} class="px-3 py-1.5">Supported systems</a>
+            <a href={`${base}changelog/`} class="px-3 py-1.5">Changelog</a>
           </nav>
           <button
             id="mobile-nav-toggle"
             type="button"
             aria-expanded="false"
             aria-controls="mobile-nav"
-            class="md:hidden text-xs font-mono uppercase tracking-wide px-3 py-1.5 border hairline"
+            class="lg:hidden text-xs font-mono uppercase tracking-wide px-3 py-1.5 border hairline"
           >
             Menu
           </button>
         </div>
       </div>
-      <nav id="mobile-nav" aria-label="Main" class="hidden md:hidden border-t hairline px-4 py-3 flex flex-col gap-2 text-sm bg-[var(--bg)]">
+      <nav id="mobile-nav" aria-label="Main" class="hidden lg:hidden border-t hairline px-4 py-3 flex flex-col gap-2 text-sm bg-[var(--bg)]">
         <a href={`${base}#get-started`}>Getting started</a>
         <a href={`${base}getting-started/`}>Documentation</a>
         <a href={`${base}guides/`}>Guides</a>
         <a href={`${base}packages/`}>Packages</a>
         <a href={`${base}app/`}>App</a>
+        <a href={`${base}supported-systems/`}>Supported systems</a>
+        <a href={`${base}changelog/`}>Changelog</a>
       </nav>
     </header>
     <main id="main" tabindex="-1" class="flex-1 min-w-0 focus:outline-none">
@@ -132,6 +136,8 @@ const ogImage = new URL(`${base}og.png`, Astro.site).href
           <a href={`${base}packages/`}>Packages</a>
           <a href={`${base}app/`}>App</a>
           <a href={`${base}guides/`}>Guides</a>
+          <a href={`${base}supported-systems/`}>Supported systems</a>
+          <a href={`${base}changelog/`}>Changelog</a>
           <a href="https://github.com/mydevmachine/devmachine" target="_blank" rel="noreferrer">GitHub<span class="sr-only"> (opens in a new tab)</span></a>
           <a href="https://github.com/mydevmachine/devmachine/blob/main/LICENSE" target="_blank" rel="noreferrer">License<span class="sr-only"> (opens in a new tab)</span></a>
           <a href={`${base}llms.txt`}>llms.txt</a>
