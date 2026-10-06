@@ -188,6 +188,37 @@ if (guide) {
   </div>
 
   <script is:inline>
+    for (const group of document.querySelectorAll('.doc-tabs')) {
+      const tabs = Array.from(group.querySelectorAll('[role="tab"]'))
+      const select = (tab, focus) => {
+        for (const t of tabs) {
+          const selected = t === tab
+          t.setAttribute('aria-selected', String(selected))
+          t.tabIndex = selected ? 0 : -1
+          const panel = document.getElementById(t.getAttribute('aria-controls'))
+          panel?.toggleAttribute('data-inactive', !selected)
+          if (panel) panel.tabIndex = selected ? 0 : -1
+        }
+        if (focus) tab.focus()
+      }
+      tabs.forEach((tab, i) => {
+        tab.addEventListener('click', () => select(tab, false))
+        tab.addEventListener('keydown', (e) => {
+          const next = {
+            ArrowRight: tabs[(i + 1) % tabs.length],
+            ArrowLeft: tabs[(i - 1 + tabs.length) % tabs.length],
+            Home: tabs[0],
+            End: tabs[tabs.length - 1],
+          }[e.key]
+          if (!next) return
+          e.preventDefault()
+          select(next, true)
+        })
+      })
+    }
+  </script>
+
+  <script is:inline>
     const sidebarToggle = document.getElementById('sidebar-toggle')
     const mobileSidebar = document.getElementById('mobile-sidebar')
     sidebarToggle?.addEventListener('click', () => {

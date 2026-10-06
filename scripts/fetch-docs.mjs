@@ -4,7 +4,7 @@
 // section, order) derived from docs/index.md. Output is gitignored: this
 // repository never keeps its own copy of the CLI's documentation.
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync, rmSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync, rmSync, copyFileSync } from 'node:fs'
 import { join, dirname, relative, resolve, posix } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { execFileSync } from 'node:child_process'
@@ -153,8 +153,37 @@ function rewriteLinks(markdown, currentRelPath) {
   })
 }
 
+const ASSET_EXTENSIONS = /\.(svg|png|jpe?g|gif|webp)$/i
+const assetsDir = join(root, 'public', 'docs-assets')
+const ASSETS_URL = `${BASE}/docs-assets`
+
+function rewriteAssets(markdown, currentRelPath) {
+  return markdown.replace(/\]\(([a-zA-Z0-9_./-]+\.(?:svg|png|jpe?g|gif|webp))\)/gi, (full, assetPath) => {
+    const { resolved } = resolveLinkTarget(currentRelPath, assetPath)
+    return `](${ASSETS_URL}/${publicPath(resolved)})`
+  })
+}
+
+function walkAssets(dir, base = '') {
+  const entries = []
+  for (const name of readdirSync(dir).sort()) {
+    const full = join(dir, name)
+    const rel = base ? `${base}/${name}` : name
+    if (statSync(full).isDirectory()) entries.push(...walkAssets(full, rel))
+    else if (ASSET_EXTENSIONS.test(name)) entries.push(rel)
+  }
+  return entries
+}
+
 rmSync(outDir, { recursive: true, force: true })
 mkdirSync(outDir, { recursive: true })
+rmSync(assetsDir, { recursive: true, force: true })
+
+for (const relPath of walkAssets(sourceDir)) {
+  const target = join(assetsDir, publicPath(relPath))
+  mkdirSync(dirname(target), { recursive: true })
+  copyFileSync(join(sourceDir, relPath), target)
+}
 
 const pages = []
 
@@ -162,7 +191,7 @@ for (const relPath of keptFiles) {
   const { meta, content: raw } = splitFrontmatter(readFileSync(join(sourceDir, relPath), 'utf8'))
   const title = publicPath(relPath) === 'guides/index.md' ? 'All guides' : firstHeading(raw, relPath)
   const section = sectionFor(relPath)
-  const body = rewriteLinks(raw.replace(/^#\s+.+\n/, ''), relPath)
+  const body = rewriteAssets(rewriteLinks(raw.replace(/^#\s+.+\n/, ''), relPath), relPath)
   const firstParagraph = (body.match(/^(?!#|```|\s*$)(.+(?:\n(?!\s*$|#|```|[-*] ).+)*)/m) || [, ''])[1]
     .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
     .replace(/[*_`]/g, '')

@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config'
 import tailwindcss from '@tailwindcss/vite'
+import rehypeDocTabs from './src/lib/rehype-doc-tabs.mjs'
 
 // github-dark's comment grey (#6A737D) is 3:1 on its own background; WCAG AA needs 4.5:1.
 const readableComments = {
@@ -47,7 +48,7 @@ export default defineConfig({
   trailingSlash: 'always',
   markdown: {
     shikiConfig: { theme: 'github-dark', transformers: [readableComments] },
-    rehypePlugins: [rehypeTableHeaders],
+    rehypePlugins: [rehypeTableHeaders, rehypeDocTabs],
   },
   vite: {
     plugins: [tailwindcss()],

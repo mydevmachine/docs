@@ -766,6 +766,28 @@ body {
   visibility: hidden;
 }
 
+.doc-tabs {
+  margin: 1.5rem 0;
+}
+
+.doc-tabs > [role="tablist"] {
+  display: flex;
+  border: 1px solid var(--line);
+}
+
+.doc-tabs .tab-btn {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.doc-tabs .tab-panels > [role="tabpanel"] {
+  padding-top: 0.5rem;
+}
+
 .app-row + .app-row {
   border-top: 1px solid var(--line);
 }
