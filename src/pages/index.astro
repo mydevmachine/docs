@@ -95,7 +95,7 @@ const appSteps = [
 ]
 
 const description =
-  'devmachine turns a Debian or Ubuntu server into your own coding machine, with one workspace per project. Free and open source.'
+  'devmachine turns a Debian, Ubuntu, Arch Linux or macOS machine into your own coding machine, with one workspace per project. Free and open source.'
 const doc = (path: string, label: string) =>
   `<a class="faq-link" href="${base}${path}">${label} →</a>`
 const faq = [
@@ -116,8 +116,8 @@ const faq = [
   },
   {
     q: 'Does it only work with Linux?',
-    a: `The machines it sets up run Debian or Ubuntu. The CLI itself runs on your computer, macOS or Linux. Your Mac can also be a machine of its own, for the packages made for it.`,
-    link: doc('how-it-works/your-computer-as-a-machine/', 'Your computer as a machine'),
+    a: `No. The machines it sets up run Debian, Ubuntu, Arch Linux or macOS. The CLI itself runs on your computer, macOS or Linux. A few packages, such as <code>caddy</code>, <code>docker</code> and <code>tailscale</code>, run only on Linux.`,
+    link: doc('supported-systems/', 'Supported systems'),
   },
   {
     q: 'Does it work on Windows?',
@@ -131,7 +131,7 @@ const faq = [
   },
   {
     q: 'Can I use my old laptop?',
-    a: `Yes, if it runs Debian or Ubuntu and you can reach it as root over SSH. Set it up from your computer on the same network with <code>devmachine machines add</code>, then add the <code>tailscale</code> package and sign it in with <code>devmachine login tailscale</code>. Put <code>tailscale:&lt;name&gt;</code> first in its addresses, and you reach it from anywhere, even from outside your home.`,
+    a: `Yes, if it runs Debian, Ubuntu or Arch Linux and you can reach it over SSH as root or as an admin login with passwordless sudo. Set it up from your computer on the same network with <code>devmachine machines add</code>, then add the <code>tailscale</code> package and sign it in with <code>devmachine login tailscale</code>. Put <code>tailscale:&lt;name&gt;</code> first in its addresses, and you reach it from anywhere, even from outside your home.`,
     link: doc('concepts/reaching-your-server/', 'Reaching your server'),
   },
   {
@@ -475,7 +475,7 @@ const jsonLd = [
     <p class="text-xs font-mono uppercase tracking-widest text-[var(--muted)] mb-3">05 / Requirements</p>
     <h2 class="text-3xl sm:text-4xl font-light tracking-tight mb-4">What to rent.</h2>
     <p class="text-[var(--muted)] max-w-2xl mb-10">
-      Any Debian or Ubuntu server works. Count the apps and coding agents you run at once, and move up later if it
+      Any Debian, Ubuntu or Arch Linux server works. Count the apps and coding agents you run at once, and move up later if it
       gets slow.
     </p>
     <div class="grid-cards grid-cols-1 sm:grid-cols-3">
