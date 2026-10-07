@@ -1,0 +1,31 @@
+scripts/widget-areas.test.mjs
+  s_c1c985d7f57ab9::t_00f035731c0392 1-56
+scripts/widget-areas.mjs
+  s_c1c985d7f57ab9::t_9c358e540e87f6 1-55
+package.json
+  s_c1c985d7f57ab9::t_d942f4e1cea55c 11-12
+.github/workflows/deploy.yml
+  s_c1c985d7f57ab9::t_d4c01e640af359 49-51
+scripts/fetch-packages.mjs
+  s_c1c985d7f57ab9::t_cb2f104c63d1fe 11
+  s_c1c985d7f57ab9::t_b7dd7594eee099 83
+  s_c1c985d7f57ab9::t_c3f4285de093fc 96-97
+README.md
+  s_c1c985d7f57ab9::t_2f8741fd22b53a 64-68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ec14af21291fb3f53b54a5ec423be99675096441",
+  "prompts": {},
+  "sessions": {
+    "s_c1c985d7f57ab9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b5256304-4a81-480d-a568-f8cf11d8ddcc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Djalma Araújo <djalma@nossomos.cc>"
+    }
+  }
+}
