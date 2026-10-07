@@ -8,6 +8,7 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { execFileSync } from 'node:child_process'
 import { parse } from 'yaml'
+import { widgetsOf } from './widget-areas.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = join(__dirname, '..')
@@ -79,6 +80,7 @@ for (const name of names) {
     variables,
     credentials,
     needs: doc.needs ?? [],
+    widgets: widgetsOf(join(packagesDir, name), doc.widgets, doc.name ?? name),
     source: `${GITHUB_TREE}/${name}`,
   })
 }
@@ -91,4 +93,5 @@ writeFileSync(
   JSON.stringify({ release, packages }, null, 2),
 )
 
-console.log(`fetch-packages: wrote ${packages.length} packages from ${sourceDir} to src/data/packages.json`)
+const widgetCount = packages.reduce((n, p) => n + p.widgets.length, 0)
+console.log(`fetch-packages: wrote ${packages.length} packages and ${widgetCount} widgets from ${sourceDir} to src/data/packages.json`)

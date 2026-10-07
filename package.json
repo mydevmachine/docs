@@ -8,7 +8,8 @@
     "dev": "npm run fetch-docs && npm run fetch-packages && astro dev",
     "build": "npm run fetch-docs && npm run fetch-packages && astro build",
     "postbuild": "pagefind --site dist",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "test": "node --test 'scripts/*.test.mjs'"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.0",
