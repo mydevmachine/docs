@@ -15,6 +15,7 @@ const { packages } = data as {
     variables: { name: string; summary: string; default: unknown }[]
     credentials: string[]
     needs: string[]
+    widgets: { name: string; summary: string; areas: string[] }[]
     source: string
   }[]
 }
@@ -102,6 +103,8 @@ const jsonLd = [
       Each package adds one thing to a machine or a workspace. Add one with
       <code class="font-mono text-[var(--ink)]">devmachine packages add &lt;name&gt;</code>,
       then <code class="font-mono text-[var(--ink)]">devmachine sync</code>.
+      Some also carry widgets for the
+      <a href={`${base}app/`} class="underline underline-offset-2">macOS app</a>'s Home and sidebars.
     </p>
     <p class="text-sm text-[var(--muted)] leading-relaxed max-w-2xl mt-3">
       <span class="pkg-included text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 border">Comes with setup</span>
@@ -170,6 +173,7 @@ const jsonLd = [
             pkg.category,
             pkg.kind ?? '',
             ...pkg.variables.map((v) => v.name),
+            ...pkg.widgets.map((w) => w.name),
           ]
             .join(' ')
             .toLowerCase()
@@ -232,7 +236,7 @@ const jsonLd = [
                 </p>
               )}
 
-              {(pkg.variables.length > 0 || pkg.credentials.length > 0) && (
+              {(pkg.variables.length > 0 || pkg.credentials.length > 0 || pkg.widgets.length > 0) && (
                 <div class="text-xs text-[var(--muted)] leading-relaxed mb-4 space-y-1">
                   {pkg.variables.length > 0 && (
                     <p>
@@ -245,6 +249,23 @@ const jsonLd = [
                       <span class="font-mono uppercase tracking-wide">Needs login:</span>{' '}
                       {pkg.credentials.join(', ')}
                     </p>
+                  )}
+                  {pkg.widgets.length > 0 && (
+                    <div>
+                      <p>
+                        <span class="font-mono uppercase tracking-wide">Widgets:</span>
+                      </p>
+                      <ul class="mt-1 space-y-1">
+                        {pkg.widgets.map((w) => (
+                          <li title={w.summary.replaceAll('`', '')}>
+                            <code class="font-mono text-[var(--ink)]">{w.name.split('/')[1]}</code>
+                            {' — '}
+                            {w.summary.split('`').map((part, i) => (i % 2 ? <code class="font-mono text-[var(--ink)]">{part}</code> : part))}
+                            {w.areas.length > 0 && <span class="text-[var(--muted)]"> ({w.areas.join(', ')})</span>}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   )}
                 </div>
               )}
