@@ -13,7 +13,7 @@ const principles = [
   },
   {
     title: 'No lock-in',
-    body: 'Underneath it is plain Linux, SSH and git. Stop using devmachine and your server still works.',
+    body: 'Underneath it is ordinary accounts, SSH and git. Stop using devmachine and your machines still work.',
   },
   {
     title: 'Extensible via packages',
@@ -106,7 +106,7 @@ const faq = [
   },
   {
     q: 'What is a workspace, and why use one?',
-    a: `A workspace is one account on the server for one project, with its own tools, logins and coding agent. Projects do not see each other's files or tokens, one project breaking does not touch the others, and you open any of them by name: <code>devmachine ssh acme</code>.`,
+    a: `A workspace is one account on the machine for one project, with its own tools, logins and coding agent. Projects do not see each other's files or tokens, one project breaking does not touch the others, and you open any of them by name: <code>devmachine ssh acme</code>.`,
     link: doc('concepts/machines-and-workspaces/', 'Machines and workspaces'),
   },
   {
@@ -115,8 +115,8 @@ const faq = [
     link: `<a class="faq-link" href="https://github.com/mydevmachine/devmachine">The code on GitHub →</a>`,
   },
   {
-    q: 'Does it only work with Linux?',
-    a: `No. The machines it sets up run Debian, Ubuntu, Arch Linux or macOS. The CLI itself runs on your computer, macOS or Linux. A few packages, such as <code>caddy</code>, <code>docker</code> and <code>tailscale</code>, run only on Linux.`,
+    q: 'Which systems does it work with?',
+    a: `The machines it sets up run Debian, Ubuntu, Arch Linux or macOS. The CLI runs on your computer: macOS, Linux, or Windows through WSL 2. A few packages, such as <code>caddy</code>, <code>docker</code> and <code>tailscale</code>, run only on Linux.`,
     link: doc('supported-systems/', 'Supported systems'),
   },
   {
@@ -131,7 +131,7 @@ const faq = [
   },
   {
     q: 'Can I use my old laptop?',
-    a: `Yes, if it runs Debian, Ubuntu or Arch Linux and you can reach it over SSH as root or as an admin login with passwordless sudo. Set it up from your computer on the same network with <code>devmachine machines add</code>, then add the <code>tailscale</code> package and sign it in with <code>devmachine login tailscale</code>. Put <code>tailscale:&lt;name&gt;</code> first in its addresses, and you reach it from anywhere, even from outside your home.`,
+    a: `Yes, if it runs Debian, Ubuntu, Arch Linux or macOS and you can reach it over SSH as root or as an admin login with passwordless sudo. On a Mac, turn on Remote Login first. Set it up from your computer on the same network with <code>devmachine machines add</code>. Then put it on Tailscale: on Linux, add the <code>tailscale</code> package and sign it in with <code>devmachine login tailscale</code>; on a Mac, install the Tailscale app yourself. Put <code>tailscale:&lt;name&gt;</code> first in its addresses, and you reach it from anywhere, even from outside your home.`,
     link: doc('concepts/reaching-your-server/', 'Reaching your server'),
   },
   {
@@ -176,7 +176,7 @@ const faq = [
   },
   {
     q: 'What happens if I stop using it?',
-    a: `Your servers keep working. Underneath it is plain Linux, SSH and git: each workspace is an ordinary account you can still log in to with <code>ssh</code>, and nothing of devmachine runs on the server between commands.`,
+    a: `Your machines keep working. Underneath it is ordinary accounts, SSH and git: each workspace is an account you can still log in to with <code>ssh</code>, and nothing of devmachine runs on the machine between commands.`,
     link: doc('concepts/machines-and-workspaces/#the-account-on-the-machine', 'The account behind a workspace'),
   },
 ]
@@ -473,10 +473,10 @@ const jsonLd = [
 
   <section id="measure-your-needs" class="frame pt-20 pb-4">
     <p class="text-xs font-mono uppercase tracking-widest text-[var(--muted)] mb-3">05 / Requirements</p>
-    <h2 class="text-3xl sm:text-4xl font-light tracking-tight mb-4">What to rent.</h2>
+    <h2 class="text-3xl sm:text-4xl font-light tracking-tight mb-4">What your machine needs.</h2>
     <p class="text-[var(--muted)] max-w-2xl mb-10">
-      Any Debian, Ubuntu or Arch Linux server works. Count the apps and coding agents you run at once, and move up later if it
-      gets slow.
+      Any Debian, Ubuntu, Arch Linux or macOS machine works: a VPS you rent, or a Mac or PC you already have. Count the apps
+      and coding agents you run at once, and move up later if it gets slow.
     </p>
     <div class="grid-cards grid-cols-1 sm:grid-cols-3">
       {
