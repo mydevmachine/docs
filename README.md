@@ -61,7 +61,11 @@ Markdown, so links people saved keep working.
   site footer;
 - for each package directory with a `package.yml`, records its name, scope,
   category, kind, summary, variables, credentials, and dependencies
-  (`needs`), plus a link to its source on GitHub.
+  (`needs`), plus a link to its source on GitHub;
+- reads each package's `widgets:` folder, when it has one, into `widgets`:
+  each widget's full name, summary, and the app areas it fits (Home,
+  Sidebar, Context sidebar), worked out in `scripts/widget-areas.mjs` the
+  way the CLI does. `npm test` runs its tests.
 
 ## Run locally
 
