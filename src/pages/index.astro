@@ -1,9 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro'
 import Hero from '../components/Hero.astro'
-import AppShot from '../components/AppShot.astro'
-import ShotViewer from '../components/ShotViewer.astro'
-import { shotExists } from '../lib/app-shots'
+import AppDemo from '../components/AppDemo.astro'
 const base = import.meta.env.BASE_URL
 
 const principles = [
@@ -70,23 +68,6 @@ const installLines = [
 ]
 
 const appDmg = 'https://github.com/mydevmachine/app-releases/releases/latest/download/Devmachine.dmg'
-const macStrip = [
-  {
-    name: '18-operator',
-    alt: 'The Operator session under Local, with Claude Code open in ~/.config/devmachine adding the globex workspace.',
-    caption: 'Operator: ask for any change.',
-  },
-  {
-    name: '01-sessions',
-    alt: 'Four sessions of the acme workspace side by side: Claude Code, Codex, tests and a dev server.',
-    caption: 'Sessions side by side.',
-  },
-  {
-    name: '19-home',
-    alt: 'The home screen with three machines, main, backup and staging, each with RAM, disk, load and container counts, above the Claude Code and Codex usage cards.',
-    caption: 'Every machine at a glance.',
-  },
-].filter(shotExists)
 const macFeatures = ['Guided setup', 'Operator session', 'Sessions side by side', 'All machines at a glance']
 const appSteps = [
   { title: 'Download Devmachine for Mac.', body: 'Drag it to Applications and open it.' },
@@ -224,6 +205,8 @@ const jsonLd = [
     headline="Code from anywhere."
     subline="Any machine you own. An isolated workspace for every project. No lock-in. Free."
   />
+
+  <AppDemo />
 
   <section id="principles" aria-labelledby="principles-title" class="frame pt-4 pb-16">
     <h2 id="principles-title" class="sr-only">Principles</h2>
@@ -425,7 +408,7 @@ const jsonLd = [
   <section id="devmachine-for-mac" class="dark-section">
     <div class="frame pt-24 pb-24">
       <p class="text-xs font-mono uppercase tracking-widest text-[#9a9a9a] mb-3">04 / macOS app</p>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start mb-12">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
         <div>
           <h2 class="text-3xl sm:text-4xl font-light tracking-tight mb-4">Devmachine for Mac.</h2>
           <p class="text-[#9a9a9a] max-w-lg">
@@ -456,18 +439,6 @@ const jsonLd = [
           </p>
         </div>
       </div>
-      {
-        macStrip.length > 0 && (
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {macStrip.map((shot) => (
-              <figure class="min-w-0">
-                <AppShot shot={shot} />
-                <figcaption class="text-sm text-[#9a9a9a] mt-2">{shot.caption}</figcaption>
-              </figure>
-            ))}
-          </div>
-        )
-      }
     </div>
   </section>
 
@@ -550,8 +521,6 @@ const jsonLd = [
       Read the documentation →
     </a>
   </section>
-
-  <ShotViewer />
 
   <script is:inline>
     ;(() => {

@@ -1,0 +1,276 @@
+---
+const base = import.meta.env.BASE_URL
+
+const scenes = [
+  {
+    id: 'sessions',
+    tab: 'Every session, every machine',
+    caption: 'Every workspace and its sessions in one sidebar. See which agent is busy and which one waits for you.',
+  },
+  {
+    id: 'cli',
+    tab: 'One file, a ready machine',
+    caption: 'Add a machine, add a package, sync. The CLI writes it to one config file and sets the machine up.',
+  },
+  {
+    id: 'context',
+    tab: 'Context while agents work',
+    caption: "Beside each session: the agent's to-do list, its sub-agents and its pull requests, live.",
+  },
+  {
+    id: 'publish',
+    tab: 'Publish and share',
+    caption: 'Publish an app at a real address. Share a session with a link and chat with your guest.',
+  },
+  {
+    id: 'home',
+    tab: 'Your Home',
+    caption: 'Home shows your machines and your coding agent usage at a glance.',
+  },
+]
+const src = (name: string) => `${base}demo/${name}`
+const first = scenes[0]
+---
+
+<section id="see-it-work" class="dark-section" aria-labelledby="see-it-work-title">
+  <div class="frame pt-20 pb-20">
+    <p class="text-xs font-mono uppercase tracking-widest text-[#9a9a9a] mb-3">The real app</p>
+    <h2 id="see-it-work-title" class="text-3xl sm:text-4xl font-light tracking-tight mb-4">See it work.</h2>
+    <p class="text-[#9a9a9a] max-w-2xl mb-10">
+      One config file turns your machines into ready workspaces. One Mac app watches and drives every session on all
+      of them.
+    </p>
+
+    <div class="demo-tabs" role="tablist" aria-label="What the app does">
+      {
+        scenes.map((scene, i) => (
+          <button
+            type="button"
+            role="tab"
+            id={`demo-tab-${scene.id}`}
+            aria-controls="demo-panel"
+            aria-selected={i === 0 ? 'true' : 'false'}
+            tabindex={i === 0 ? '0' : '-1'}
+            data-scene={scene.id}
+            data-caption={scene.caption}
+            class="demo-tab text-sm font-mono uppercase tracking-wide"
+          >
+            {scene.tab}
+          </button>
+        ))
+      }
+    </div>
+
+    <div id="demo-panel" role="tabpanel" aria-labelledby={`demo-tab-${first.id}`} class="demo-panel">
+      <div class="demo-frame">
+        <video
+          id="demo-video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          poster={src(`${first.id}-poster.webp`)}
+          aria-label={first.caption}
+        >
+          <source src={src(`${first.id}.webm`)} type="video/webm" />
+          <source src={src(`${first.id}.mp4`)} type="video/mp4" />
+        </video>
+        <script is:inline>
+          ;(() => {
+            if (!matchMedia('(prefers-reduced-motion: reduce)').matches) return
+            const video = document.getElementById('demo-video')
+            video.removeAttribute('autoplay')
+            video.pause()
+          })()
+        </script>
+        <button type="button" id="demo-motion" class="demo-motion" aria-pressed="false" aria-label="Pause video" title="Pause video">
+          <svg class="demo-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14"></rect><rect x="14" y="5" width="4" height="14"></rect></svg>
+          <svg class="demo-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>
+        </button>
+      </div>
+      <p id="demo-caption" class="text-sm text-[#9a9a9a] mt-4" aria-live="polite">{first.caption}</p>
+    </div>
+  </div>
+</section>
+
+<script is:inline define:vars={{ base }}>
+  ;(() => {
+    const video = document.getElementById('demo-video')
+    const caption = document.getElementById('demo-caption')
+    const panel = document.getElementById('demo-panel')
+    const motion = document.getElementById('demo-motion')
+    const tabs = Array.from(document.querySelectorAll('#see-it-work [role="tab"]'))
+    if (!video || !tabs.length) return
+
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+    video.removeAttribute('autoplay')
+    let current = 0
+    let touched = false
+    let paused = reduced
+    let visible = false
+
+    const url = (name) => `${base}demo/${name}`
+
+    function updateMotion() {
+      motion.setAttribute('aria-pressed', String(paused))
+      const label = paused ? 'Play video' : 'Pause video'
+      motion.setAttribute('aria-label', label)
+      motion.title = label
+    }
+
+    function play() {
+      if (paused || !visible) return
+      const started = video.play()
+      if (started) started.catch(() => {})
+    }
+
+    function show(index, focus) {
+      current = index
+      const tab = tabs[index]
+      const scene = tab.dataset.scene
+      for (const t of tabs) {
+        const selected = t === tab
+        t.setAttribute('aria-selected', String(selected))
+        t.tabIndex = selected ? 0 : -1
+      }
+      panel.setAttribute('aria-labelledby', tab.id)
+      caption.textContent = tab.dataset.caption
+      video.setAttribute('aria-label', tab.dataset.caption)
+      video.poster = url(`${scene}-poster.webp`)
+      const [webm, mp4] = video.querySelectorAll('source')
+      webm.src = url(`${scene}.webm`)
+      mp4.src = url(`${scene}.mp4`)
+      video.load()
+      play()
+      if (focus) tab.focus()
+      tab.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+    }
+
+    function stopTouring() {
+      touched = true
+      video.loop = true
+    }
+
+    video.loop = false
+    video.addEventListener('ended', () => {
+      if (touched) return
+      show((current + 1) % tabs.length, false)
+    })
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => {
+        stopTouring()
+        show(i, false)
+      })
+      tab.addEventListener('keydown', (e) => {
+        const targets = {
+          ArrowRight: (i + 1) % tabs.length,
+          ArrowLeft: (i - 1 + tabs.length) % tabs.length,
+          Home: 0,
+          End: tabs.length - 1,
+        }
+        if (!(e.key in targets)) return
+        e.preventDefault()
+        stopTouring()
+        show(targets[e.key], true)
+      })
+    })
+
+    motion.addEventListener('click', () => {
+      stopTouring()
+      paused = !paused
+      updateMotion()
+      if (paused) video.pause()
+      else play()
+    })
+    updateMotion()
+
+    new IntersectionObserver((entries) => {
+      visible = entries.some((entry) => entry.isIntersecting)
+      if (visible) play()
+      else video.pause()
+    }, { threshold: 0.25 }).observe(video)
+  })()
+</script>
+
+<style>
+  .demo-tabs {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-bottom: 1px solid var(--dark-line);
+    margin-bottom: 1.5rem;
+  }
+
+  .demo-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .demo-tab {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 0.75rem 1rem;
+    color: #9a9a9a;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .demo-tab:hover {
+    color: var(--dark-ink);
+  }
+
+  .demo-tab[aria-selected='true'] {
+    color: var(--dark-ink);
+    border-bottom-color: #5aa9e6;
+  }
+
+  .demo-frame {
+    position: relative;
+    aspect-ratio: 14 / 9;
+    background: #000;
+    border: 1px solid var(--dark-line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .demo-frame video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .demo-motion {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid var(--dark-line);
+    border-radius: 999px;
+    background: rgba(5, 5, 5, 0.7);
+    color: var(--dark-ink);
+    cursor: pointer;
+  }
+
+  .demo-motion svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .demo-motion .demo-play,
+  .demo-motion[aria-pressed='true'] .demo-pause {
+    display: none;
+  }
+
+  .demo-motion[aria-pressed='true'] .demo-play {
+    display: block;
+  }
+</style>
