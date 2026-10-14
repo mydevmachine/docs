@@ -38,7 +38,7 @@ const scenes = [
     caption: 'Prefer the terminal? Type the same commands yourself: add a machine, add a package, sync.',
   },
 ]
-const mainIds = ['home', 'operator', 'sessions', 'context']
+const mainIds = ['home', 'operator', 'sessions', 'context', 'share', 'publish']
 const mainScenes = mainIds.map((id) => scenes.find((scene) => scene.id === id)!)
 const moreScenes = scenes.filter((scene) => !mainIds.includes(scene.id))
 const src = (name: string) => `${base}demo/${name}`
