@@ -3,6 +3,11 @@ const base = import.meta.env.BASE_URL
 
 const scenes = [
   {
+    id: 'operator',
+    tab: 'Operator',
+    caption: 'Ask the Operator for anything. It runs devmachine for you.',
+  },
+  {
     id: 'sessions',
     tab: 'Every session, every machine',
     caption: 'Every workspace and its sessions in one sidebar. See which agent is busy and which one waits for you.',
@@ -10,12 +15,12 @@ const scenes = [
   {
     id: 'cli',
     tab: 'One file, a ready machine',
-    caption: 'Add a machine, add a package, sync. The CLI writes it to one config file and sets the machine up.',
+    caption: 'Prefer the terminal? Type the same commands yourself: add a machine, add a package, sync. One config file holds it all.',
   },
   {
     id: 'context',
     tab: 'Context while agents work',
-    caption: "Beside each session: the agent's to-do list, its sub-agents and its pull requests, live.",
+    caption: "Beside each session: the agent's to-do list, its sub-agents, its pull requests and its branch, live.",
   },
   {
     id: 'publish',
@@ -25,20 +30,20 @@ const scenes = [
   {
     id: 'home',
     tab: 'Your Home',
-    caption: 'Home shows your machines and your coding agent usage at a glance.',
+    caption: 'Your Home: arrange, resize and add widgets.',
   },
 ]
 const src = (name: string) => `${base}demo/${name}`
 const first = scenes[0]
 ---
 
-<section id="see-it-work" class="dark-section" aria-labelledby="see-it-work-title">
+<section id="meet-devmachine" class="dark-section scroll-mt-20" aria-labelledby="meet-devmachine-title">
+  <span id="see-it-work" aria-hidden="true"></span>
   <div class="frame pt-20 pb-20">
     <p class="text-xs font-mono uppercase tracking-widest text-[#9a9a9a] mb-3">The real app</p>
-    <h2 id="see-it-work-title" class="text-3xl sm:text-4xl font-light tracking-tight mb-4">See it work.</h2>
+    <h2 id="meet-devmachine-title" class="text-3xl sm:text-4xl font-light tracking-tight mb-4">Meet Devmachine.</h2>
     <p class="text-[#9a9a9a] max-w-2xl mb-10">
-      One config file turns your machines into ready workspaces. One Mac app watches and drives every session on all
-      of them.
+      No more Googling, tutorials or YouTube. Just ask, and the Operator sets it up for you.
     </p>
 
     <div class="demo-tabs" role="tablist" aria-label="What the app does">
@@ -100,7 +105,7 @@ const first = scenes[0]
     const caption = document.getElementById('demo-caption')
     const panel = document.getElementById('demo-panel')
     const motion = document.getElementById('demo-motion')
-    const tabs = Array.from(document.querySelectorAll('#see-it-work [role="tab"]'))
+    const tabs = Array.from(document.querySelectorAll('#meet-devmachine [role="tab"]'))
     if (!video || !tabs.length) return
 
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
