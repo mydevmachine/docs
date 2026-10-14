@@ -200,13 +200,11 @@ const jsonLd = [
 
 
 <BaseLayout title="devmachine - Code from anywhere." description={description} current="home" jsonLd={jsonLd}>
-  <div class="hero-screen">
-    <Hero
-      eyebrow="Your own development shed"
-      headline="Code from anywhere."
-      subline="Any machine you own. An isolated workspace for every project. No lock-in. Free."
-    />
-  </div>
+  <Hero
+    eyebrow="Your own development shed"
+    headline="Code from anywhere."
+    subline="Any machine you own. An isolated workspace for every project. No lock-in. Free."
+  />
 
   <AppDemo />
 
@@ -576,10 +574,6 @@ const jsonLd = [
 </BaseLayout>
 
 <style>
-  .hero-screen {
-    min-height: 100svh;
-  }
-
   .how-steps {
     display: grid;
     gap: 2.5rem;
