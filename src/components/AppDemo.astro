@@ -38,8 +38,11 @@ const scenes = [
     caption: 'Your Home: arrange, resize and add widgets.',
   },
 ]
+const mainIds = ['operator', 'sessions', 'context', 'share']
+const mainScenes = mainIds.map((id) => scenes.find((scene) => scene.id === id)!)
+const moreScenes = scenes.filter((scene) => !mainIds.includes(scene.id))
 const src = (name: string) => `${base}demo/${name}`
-const first = scenes[0]
+const first = mainScenes[0]
 ---
 
 <section id="meet-devmachine" class="dark-section scroll-mt-20" aria-labelledby="meet-devmachine-title">
@@ -51,19 +54,49 @@ const first = scenes[0]
       No more Googling, tutorials or YouTube. Just ask, and the Operator sets it up for you.
     </p>
 
-    <div class="demo-tabs" role="tablist" aria-label="What the app does">
+    <div class="demo-row">
+      <div class="demo-tabs" role="tablist" aria-label="What the app does">
+        {
+          mainScenes.map((scene, i) => (
+            <button
+              type="button"
+              role="tab"
+              id={`demo-tab-${scene.id}`}
+              aria-controls="demo-panel"
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? '0' : '-1'}
+              data-scene={scene.id}
+              data-caption={scene.caption}
+              class="demo-tab text-sm font-mono uppercase tracking-wide"
+            >
+              {scene.tab}
+            </button>
+          ))
+        }
+      </div>
+      <button
+        type="button"
+        id="demo-more-toggle"
+        class="demo-more-toggle text-sm font-mono uppercase tracking-wide"
+        aria-expanded="false"
+        aria-controls="demo-more"
+      >
+        <span class="demo-more-label">More demos</span> <span aria-hidden="true" class="demo-more-mark">▾</span>
+      </button>
+    </div>
+    <div id="demo-more" class="demo-tabs demo-tabs-more" role="tablist" aria-label="More demos" hidden>
       {
-        scenes.map((scene, i) => (
+        moreScenes.map((scene) => (
           <button
             type="button"
             role="tab"
             id={`demo-tab-${scene.id}`}
             aria-controls="demo-panel"
-            aria-selected={i === 0 ? 'true' : 'false'}
-            tabindex={i === 0 ? '0' : '-1'}
+            aria-selected="false"
+            tabindex="-1"
             data-scene={scene.id}
             data-caption={scene.caption}
-            class="demo-tab text-sm font-mono uppercase tracking-wide"
+            class="demo-tab text-xs font-mono uppercase tracking-wide"
           >
             {scene.tab}
           </button>
@@ -111,7 +144,9 @@ const first = scenes[0]
     const panel = document.getElementById('demo-panel')
     const motion = document.getElementById('demo-motion')
     const tabs = Array.from(document.querySelectorAll('#meet-devmachine [role="tab"]'))
-    if (!video || !tabs.length) return
+    const more = document.getElementById('demo-more')
+    const toggle = document.getElementById('demo-more-toggle')
+    if (!video || !tabs.length || !more || !toggle) return
 
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
     video.removeAttribute('autoplay')
@@ -133,6 +168,17 @@ const first = scenes[0]
       if (paused || !visible) return
       const started = video.play()
       if (started) started.catch(() => {})
+    }
+
+    const visibleTabs = () => tabs.filter((tab) => !more.contains(tab) || !more.hidden)
+
+    function setExpanded(open) {
+      const active = tabs[current]
+      const keep = !open && more.contains(active)
+      more.hidden = !(open || keep)
+      toggle.setAttribute('aria-expanded', String(!more.hidden))
+      toggle.querySelector('.demo-more-label').textContent = more.hidden ? 'More demos' : 'Fewer demos'
+      toggle.querySelector('.demo-more-mark').textContent = more.hidden ? '▾' : '▴'
     }
 
     function show(index, focus) {
@@ -165,7 +211,13 @@ const first = scenes[0]
     video.loop = false
     video.addEventListener('ended', () => {
       if (touched) return
-      show((current + 1) % tabs.length, false)
+      const shown = visibleTabs()
+      const next = shown[(shown.indexOf(tabs[current]) + 1) % shown.length]
+      show(tabs.indexOf(next), false)
+    })
+
+    toggle.addEventListener('click', () => {
+      setExpanded(more.hidden)
     })
 
     tabs.forEach((tab, i) => {
@@ -174,16 +226,18 @@ const first = scenes[0]
         show(i, false)
       })
       tab.addEventListener('keydown', (e) => {
+        const shown = visibleTabs()
+        const at = shown.indexOf(tab)
         const targets = {
-          ArrowRight: (i + 1) % tabs.length,
-          ArrowLeft: (i - 1 + tabs.length) % tabs.length,
-          Home: 0,
-          End: tabs.length - 1,
+          ArrowRight: shown[(at + 1) % shown.length],
+          ArrowLeft: shown[(at - 1 + shown.length) % shown.length],
+          Home: shown[0],
+          End: shown[shown.length - 1],
         }
         if (!(e.key in targets)) return
         e.preventDefault()
         stopTouring()
-        show(targets[e.key], true)
+        show(tabs.indexOf(targets[e.key]), true)
       })
     })
 
@@ -205,12 +259,48 @@ const first = scenes[0]
 </script>
 
 <style>
+  .demo-row {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid var(--dark-line);
+    margin-bottom: 0.5rem;
+  }
+
   .demo-tabs {
     display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
     overflow-x: auto;
     scrollbar-width: none;
+  }
+
+  .demo-tabs[hidden] {
+    display: none;
+  }
+
+  .demo-tabs-more {
     border-bottom: 1px solid var(--dark-line);
-    margin-bottom: 1.5rem;
+  }
+
+  .demo-tabs-more .demo-tab {
+    padding: 0.5rem 1rem;
+    color: #7c7c7c;
+  }
+
+  .demo-panel {
+    margin-top: 1rem;
+  }
+
+  .demo-more-toggle {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 0.75rem 0 0.75rem 1rem;
+    color: #9a9a9a;
+    cursor: pointer;
+  }
+
+  .demo-more-toggle:hover {
+    color: var(--dark-ink);
   }
 
   .demo-tabs::-webkit-scrollbar {
