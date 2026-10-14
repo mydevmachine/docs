@@ -3,29 +3,24 @@ const base = import.meta.env.BASE_URL
 
 const scenes = [
   {
+    id: 'home',
+    tab: 'Home',
+    caption: 'Home: your machines and coding agent usage at a glance. Arrange, resize and add widgets.',
+  },
+  {
     id: 'operator',
-    tab: 'Operator',
-    caption: 'Ask the Operator for anything. It runs devmachine for you.',
+    tab: 'The Operator',
+    caption: 'Pick your coding agent, then ask the Operator for anything. It runs devmachine for you.',
   },
   {
     id: 'sessions',
-    tab: 'Every session, every machine',
-    caption: 'Every workspace and its sessions in one sidebar. See which agent is busy and which one waits for you.',
-  },
-  {
-    id: 'cli',
-    tab: 'One file, a ready machine',
-    caption: 'Prefer the terminal? Type the same commands yourself: add a machine, add a package, sync. One config file holds it all.',
+    tab: 'Grid sessions',
+    caption: "A workspace's sessions side by side. Move, resize and widen each one with its own icons.",
   },
   {
     id: 'context',
-    tab: 'Context while agents work',
+    tab: 'Session awareness',
     caption: "Beside each session: the agent's to-do list, its sub-agents, its pull requests and its branch, live.",
-  },
-  {
-    id: 'publish',
-    tab: 'Publish an app',
-    caption: 'Publish a port as an https app at your own address. It goes from pending to published.',
   },
   {
     id: 'share',
@@ -33,12 +28,17 @@ const scenes = [
     caption: 'Share a live session: others open it in their browser and work with you.',
   },
   {
-    id: 'home',
-    tab: 'Your Home',
-    caption: 'Your Home: arrange, resize and add widgets.',
+    id: 'publish',
+    tab: 'Publish an app',
+    caption: 'Publish a port as an https app at your own address. It goes from pending to published.',
+  },
+  {
+    id: 'cli',
+    tab: 'Hack with the CLI',
+    caption: 'Prefer the terminal? Type the same commands yourself: add a machine, add a package, sync.',
   },
 ]
-const mainIds = ['operator', 'sessions', 'context', 'share']
+const mainIds = ['home', 'operator', 'sessions', 'context']
 const mainScenes = mainIds.map((id) => scenes.find((scene) => scene.id === id)!)
 const moreScenes = scenes.filter((scene) => !mainIds.includes(scene.id))
 const src = (name: string) => `${base}demo/${name}`
