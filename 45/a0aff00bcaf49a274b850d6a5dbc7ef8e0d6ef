@@ -1,0 +1,21 @@
+src/components/AppDemo.astro
+  s_0f105d87334789::t_97ff742abbeb00 5-9,18,23,33,40-41,44,46,108
+src/pages/index.astro
+  s_0f105d87334789::t_0b180fa0e9b94d 203-209,579-582
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "45a0aff00bcaf49a274b850d6a5dbc7ef8e0d6ef",
+  "prompts": {},
+  "sessions": {
+    "s_0f105d87334789": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3a5d445d-a266-4f47-9d99-dffda990876e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Djalma Araújo <djalma@nossomos.cc>"
+    }
+  }
+}
