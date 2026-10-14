@@ -1,0 +1,376 @@
+---
+const base = import.meta.env.BASE_URL
+
+const scenes = [
+  {
+    id: 'home',
+    tab: 'Home',
+    caption: 'Home: your machines and coding agent usage at a glance. Arrange, resize and add widgets.',
+  },
+  {
+    id: 'operator',
+    tab: 'The Operator',
+    caption: 'Pick your coding agent, then ask the Operator for anything. It runs devmachine for you.',
+  },
+  {
+    id: 'sessions',
+    tab: 'Grid sessions',
+    caption: "A workspace's sessions side by side. Move, resize and widen each one with its own icons.",
+  },
+  {
+    id: 'context',
+    tab: 'Session awareness',
+    caption: "Beside each session: the agent's to-do list, its sub-agents, its pull requests and its branch, live.",
+  },
+  {
+    id: 'share',
+    tab: 'Collaborate with others',
+    caption: 'Share a live session: others open it in their browser and work with you.',
+  },
+  {
+    id: 'publish',
+    tab: 'Publish an app',
+    caption: 'Publish a port as an https app at your own address. It goes from pending to published.',
+  },
+  {
+    id: 'cli',
+    tab: 'Hack with the CLI',
+    caption: 'Prefer the terminal? Type the same commands yourself: add a machine, add a package, sync.',
+  },
+]
+const mainIds = ['home', 'operator', 'sessions', 'context', 'share', 'publish']
+const mainScenes = mainIds.map((id) => scenes.find((scene) => scene.id === id)!)
+const moreScenes = scenes.filter((scene) => !mainIds.includes(scene.id))
+const src = (name: string) => `${base}demo/${name}`
+const first = mainScenes[0]
+---
+
+<section id="meet-devmachine" class="dark-section scroll-mt-20" aria-labelledby="meet-devmachine-title">
+  <span id="see-it-work" aria-hidden="true"></span>
+  <div class="frame pt-20 pb-20">
+    <p class="text-xs font-mono uppercase tracking-widest text-[#9a9a9a] mb-3">The real app</p>
+    <h2 id="meet-devmachine-title" class="text-3xl sm:text-4xl font-light tracking-tight mb-4">Meet Devmachine.</h2>
+    <p class="text-[#9a9a9a] max-w-2xl mb-10">
+      No more Googling, tutorials or YouTube. Just ask, and the Operator sets it up for you.
+    </p>
+
+    <div class="demo-row">
+      <div class="demo-tabs" role="tablist" aria-label="What the app does">
+        {
+          mainScenes.map((scene, i) => (
+            <button
+              type="button"
+              role="tab"
+              id={`demo-tab-${scene.id}`}
+              aria-controls="demo-panel"
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? '0' : '-1'}
+              data-scene={scene.id}
+              data-caption={scene.caption}
+              class="demo-tab text-sm font-mono uppercase tracking-wide"
+            >
+              {scene.tab}
+            </button>
+          ))
+        }
+      </div>
+      <button
+        type="button"
+        id="demo-more-toggle"
+        class="demo-more-toggle text-sm font-mono uppercase tracking-wide"
+        aria-expanded="false"
+        aria-controls="demo-more"
+      >
+        <span class="demo-more-label">More demos</span> <span aria-hidden="true" class="demo-more-mark">▾</span>
+      </button>
+    </div>
+    <div id="demo-more" class="demo-tabs demo-tabs-more" role="tablist" aria-label="More demos" hidden>
+      {
+        moreScenes.map((scene) => (
+          <button
+            type="button"
+            role="tab"
+            id={`demo-tab-${scene.id}`}
+            aria-controls="demo-panel"
+            aria-selected="false"
+            tabindex="-1"
+            data-scene={scene.id}
+            data-caption={scene.caption}
+            class="demo-tab text-xs font-mono uppercase tracking-wide"
+          >
+            {scene.tab}
+          </button>
+        ))
+      }
+    </div>
+
+    <div id="demo-panel" role="tabpanel" aria-labelledby={`demo-tab-${first.id}`} class="demo-panel">
+      <div class="demo-frame">
+        <video
+          id="demo-video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          poster={src(`${first.id}-poster.webp`)}
+          aria-label={first.caption}
+        >
+          <source src={src(`${first.id}.webm`)} type="video/webm" />
+          <source src={src(`${first.id}.mp4`)} type="video/mp4" />
+        </video>
+        <script is:inline>
+          ;(() => {
+            if (!matchMedia('(prefers-reduced-motion: reduce)').matches) return
+            const video = document.getElementById('demo-video')
+            video.removeAttribute('autoplay')
+            video.pause()
+          })()
+        </script>
+        <button type="button" id="demo-motion" class="demo-motion" aria-pressed="false" aria-label="Pause video" title="Pause video">
+          <svg class="demo-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14"></rect><rect x="14" y="5" width="4" height="14"></rect></svg>
+          <svg class="demo-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>
+        </button>
+      </div>
+      <p id="demo-caption" class="text-sm text-[#9a9a9a] mt-4" aria-live="polite">{first.caption}</p>
+    </div>
+  </div>
+</section>
+
+<script is:inline define:vars={{ base }}>
+  ;(() => {
+    const video = document.getElementById('demo-video')
+    const caption = document.getElementById('demo-caption')
+    const panel = document.getElementById('demo-panel')
+    const motion = document.getElementById('demo-motion')
+    const tabs = Array.from(document.querySelectorAll('#meet-devmachine [role="tab"]'))
+    const more = document.getElementById('demo-more')
+    const toggle = document.getElementById('demo-more-toggle')
+    if (!video || !tabs.length || !more || !toggle) return
+
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+    video.removeAttribute('autoplay')
+    let current = 0
+    let touched = false
+    let paused = reduced
+    let visible = false
+
+    const url = (name) => `${base}demo/${name}`
+
+    function updateMotion() {
+      motion.setAttribute('aria-pressed', String(paused))
+      const label = paused ? 'Play video' : 'Pause video'
+      motion.setAttribute('aria-label', label)
+      motion.title = label
+    }
+
+    function play() {
+      if (paused || !visible) return
+      const started = video.play()
+      if (started) started.catch(() => {})
+    }
+
+    const visibleTabs = () => tabs.filter((tab) => !more.contains(tab) || !more.hidden)
+
+    function setExpanded(open) {
+      const active = tabs[current]
+      const keep = !open && more.contains(active)
+      more.hidden = !(open || keep)
+      toggle.setAttribute('aria-expanded', String(!more.hidden))
+      toggle.querySelector('.demo-more-label').textContent = more.hidden ? 'More demos' : 'Fewer demos'
+      toggle.querySelector('.demo-more-mark').textContent = more.hidden ? '▾' : '▴'
+    }
+
+    function show(index, focus) {
+      current = index
+      const tab = tabs[index]
+      const scene = tab.dataset.scene
+      for (const t of tabs) {
+        const selected = t === tab
+        t.setAttribute('aria-selected', String(selected))
+        t.tabIndex = selected ? 0 : -1
+      }
+      panel.setAttribute('aria-labelledby', tab.id)
+      caption.textContent = tab.dataset.caption
+      video.setAttribute('aria-label', tab.dataset.caption)
+      video.poster = url(`${scene}-poster.webp`)
+      const [webm, mp4] = video.querySelectorAll('source')
+      webm.src = url(`${scene}.webm`)
+      mp4.src = url(`${scene}.mp4`)
+      video.load()
+      play()
+      if (focus) tab.focus()
+      tab.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+    }
+
+    function stopTouring() {
+      touched = true
+      video.loop = true
+    }
+
+    video.loop = false
+    video.addEventListener('ended', () => {
+      if (touched) return
+      const shown = visibleTabs()
+      const next = shown[(shown.indexOf(tabs[current]) + 1) % shown.length]
+      show(tabs.indexOf(next), false)
+    })
+
+    toggle.addEventListener('click', () => {
+      setExpanded(more.hidden)
+    })
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => {
+        stopTouring()
+        show(i, false)
+      })
+      tab.addEventListener('keydown', (e) => {
+        const shown = visibleTabs()
+        const at = shown.indexOf(tab)
+        const targets = {
+          ArrowRight: shown[(at + 1) % shown.length],
+          ArrowLeft: shown[(at - 1 + shown.length) % shown.length],
+          Home: shown[0],
+          End: shown[shown.length - 1],
+        }
+        if (!(e.key in targets)) return
+        e.preventDefault()
+        stopTouring()
+        show(tabs.indexOf(targets[e.key]), true)
+      })
+    })
+
+    motion.addEventListener('click', () => {
+      stopTouring()
+      paused = !paused
+      updateMotion()
+      if (paused) video.pause()
+      else play()
+    })
+    updateMotion()
+
+    new IntersectionObserver((entries) => {
+      visible = entries.some((entry) => entry.isIntersecting)
+      if (visible) play()
+      else video.pause()
+    }, { threshold: 0.25 }).observe(video)
+  })()
+</script>
+
+<style>
+  .demo-row {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid var(--dark-line);
+    margin-bottom: 0.5rem;
+  }
+
+  .demo-tabs {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .demo-tabs[hidden] {
+    display: none;
+  }
+
+  .demo-tabs-more {
+    border-bottom: 1px solid var(--dark-line);
+  }
+
+  .demo-tabs-more .demo-tab {
+    padding: 0.5rem 1rem;
+    color: #7c7c7c;
+  }
+
+  .demo-panel {
+    margin-top: 1rem;
+  }
+
+  .demo-more-toggle {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 0.75rem 0 0.75rem 1rem;
+    color: #9a9a9a;
+    cursor: pointer;
+  }
+
+  .demo-more-toggle:hover {
+    color: var(--dark-ink);
+  }
+
+  .demo-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .demo-tab {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 0.75rem 1rem;
+    color: #9a9a9a;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .demo-tab:hover {
+    color: var(--dark-ink);
+  }
+
+  .demo-tab[aria-selected='true'] {
+    color: var(--dark-ink);
+    border-bottom-color: #5aa9e6;
+  }
+
+  .demo-frame {
+    position: relative;
+    aspect-ratio: 14 / 9;
+    background: #000;
+    border: 1px solid var(--dark-line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .demo-frame video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .demo-motion {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid var(--dark-line);
+    border-radius: 999px;
+    background: rgba(5, 5, 5, 0.7);
+    color: var(--dark-ink);
+    cursor: pointer;
+  }
+
+  .demo-motion svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .demo-motion .demo-play,
+  .demo-motion[aria-pressed='true'] .demo-pause {
+    display: none;
+  }
+
+  .demo-motion[aria-pressed='true'] .demo-play {
+    display: block;
+  }
+</style>
