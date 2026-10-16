@@ -109,6 +109,52 @@ const allSections: Section[] = [
     ],
   },
   {
+    id: 'quick-chat',
+    title: 'Quick chat from any app',
+    body: 'Press ⌃⌥Space over any app and type a question. The answer streams in from Claude or Codex, on a workspace or on this Mac. It runs the claude or codex CLI you are already logged in to, on your own subscription: no API key. Press Return to follow up, ⌘↩ to open the chat in the app, or Esc to close it. Change the shortcut in Settings → Chats.',
+    shots: [
+      {
+        name: '25-quick-panel',
+        alt: 'The quick chat panel over a blurred desktop: the question "how do I list tmux sessions on another socket?", and Claude on main streaming an answer with a code block of two tmux commands. Below are the Claude and main pickers, and the hints Open in Devmachine ⌘↩ and Esc to close.',
+        caption: 'A question from any app, answered by Claude on main.',
+      },
+    ],
+  },
+  {
+    id: 'chats',
+    title: 'Chats',
+    body: 'Chats sits next to Code and Schedule in the menu at the top of the sidebar, or press ⌘2. Pick Claude or Codex, then a workspace or This Mac, and ask. A chat is read only: it reads your files to answer and never changes them. Coding happens in a session. It runs on your own Claude or Codex login, with no API key, and every chat is kept on your Mac, so an old one opens without a connection.',
+    prompts: [
+      'How does the CLI rebuild the session list after a sweep? Point me at the code.',
+      'Why does the webhook test fail on acme-api?',
+      'What TTL should the new subdomain record have?',
+    ],
+    shots: [
+      {
+        name: '26-chats',
+        alt: 'The Chats mode: a sidebar of chats grouped by Today, Yesterday and Previous 7 days, some marked acme-api or blog. The open chat, How sessions are rebuilt, runs Claude on main in ~/chats, marked Read only. Claude read two files, was blocked from running a Bash command, and answered with a Go code block.',
+        caption: 'A read only chat with Claude on main.',
+      },
+      {
+        name: '28-mode-menu',
+        alt: 'The menu at the top of the sidebar open, with Code ⌘1, Chats ⌘2 (chosen) and Schedule ⌘3.',
+        caption: 'Code, Chats and Schedule, one menu.',
+      },
+    ],
+  },
+  {
+    id: 'ask',
+    title: 'Ask about a running session',
+    body: "In a session's Context tab, Ask answers side questions about that session: why it changed a file, what it tried, where it stopped. It reads the session's transcript and answers from it alone, on the same Claude or Codex login, with no API key. It never types into the session or interrupts it, so the agent keeps working. Ask a follow-up, or press Clear to start over.",
+    shots: [
+      {
+        name: '27-ask',
+        alt: 'The Context tab of a session, with its todo list and links, and below them Ask about this session with Claude. The question "why did it change ChargeService?" is answered: the retry after a gateway timeout charged twice, so it added an idempotency key, with a link to the file and a note that the answer is based on 4 excerpts from the transcript.',
+        caption: 'A side question, answered from the transcript.',
+      },
+    ],
+  },
+  {
     id: 'drop-files',
     title: 'Drop files onto a session',
     body: 'Drag files from Finder onto a session and they land on its machine, with the path typed at the prompt for you. Paste an image with ⌘V and it works the same way. Each file keeps its name plus the time, so nothing gets overwritten.',
@@ -340,6 +386,9 @@ const features = [
   { title: '⌘K', body: 'Jump to any screen, session, machine or action.' },
   { title: 'A context panel', body: 'Todo, pull requests, links, files and git of each session.' },
   { title: 'Scheduled tasks', body: 'A command or a prompt that runs on its own in a workspace, on a schedule.' },
+  { title: 'Quick chat', body: '⌃⌥Space over any app asks Claude or Codex, on your own login.' },
+  { title: 'Chats', body: 'Read only chats with Claude or Codex on any workspace. No API key.' },
+  { title: 'Ask', body: 'Side questions about a running session, answered from its transcript.' },
   { title: 'Home, stats and health', body: 'RAM, disk, load, containers and a health check of every machine.' },
   { title: 'A network map', body: 'Your machines by place, with their sites, links and workspaces.' },
   { title: 'Map as wallpaper', body: 'A photo, a gradient or your network behind Home.' },
@@ -358,6 +407,7 @@ const cliEquivalents = [
   { what: 'Publish a port', cmd: 'devmachine expose add acme 3000 --host app.example.com', href: `${base}reference/commands/#expose` },
   { what: 'Add a package', cmd: 'devmachine packages add claude-code --workspace acme', href: `${base}reference/commands/#packages` },
   { what: 'Schedule a prompt', cmd: 'devmachine scheduled add --workspace acme --name "Monthly briefing" --folder ~/acme-web --harness claude --prompt "Brief me on last month" --every monthly --day 1 --at 09:00', href: `${base}reference/commands/#scheduled` },
+  { what: 'Ask a question', cmd: 'devmachine chat send --workspace acme -- "How does billing round amounts?"', href: `${base}reference/commands/#chat` },
   { what: 'Send a file to a workspace', cmd: 'devmachine upload mockup.png --workspace acme', href: `${base}reference/commands/#upload` },
   { what: 'See machine stats', cmd: 'devmachine stats', href: `${base}reference/commands/#stats` },
   { what: 'Run the health check', cmd: 'devmachine doctor', href: `${base}reference/commands/#doctor` },
@@ -465,6 +515,16 @@ const jsonLd = [
                     class="underline underline-offset-2 text-[var(--muted)] hover:text-[var(--ink)]"
                   >
                     More examples, and why it runs where you choose
+                  </a>
+                </p>
+              )}
+              {(section.id === 'chats' || section.id === 'ask') && (
+                <p class="text-sm mt-4">
+                  <a
+                    href={`${base}how-it-works/chats/${section.id === 'ask' ? '#asking-about-a-session' : ''}`}
+                    class="underline underline-offset-2 text-[var(--muted)] hover:text-[var(--ink)]"
+                  >
+                    {section.id === 'ask' ? 'What it reads, and why it never touches the session →' : 'Why it runs your CLI, and what read only means →'}
                   </a>
                 </p>
               )}
