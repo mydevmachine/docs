@@ -28,6 +28,21 @@ const scenes = [
     caption: 'Tasks that run on their own in a workspace, with your Mac off: a command, or a prompt for Claude or Codex. Each run keeps its output.',
   },
   {
+    id: 'quickchat',
+    tab: 'Quick chat',
+    caption: 'Press ⌃⌥Space over any app, ask, and the answer streams in. It runs on your own Claude or Codex login, no API key. ⌘↩ opens it in Chats.',
+  },
+  {
+    id: 'chats',
+    tab: 'Chats',
+    caption: 'Chat with Claude or Codex on any workspace or on this Mac. Read only: it reads your files and never changes them.',
+  },
+  {
+    id: 'ask',
+    tab: 'Ask about a session',
+    caption: "Ask about a running session from its Context tab. The answer comes from the session's transcript, and the session keeps working.",
+  },
+  {
     id: 'share',
     tab: 'Collaborate with others',
     caption: 'Share a live session: others open it in their browser and work with you.',
@@ -43,7 +58,7 @@ const scenes = [
     caption: 'Prefer the terminal? Type the same commands yourself: add a machine, add a package, sync.',
   },
 ]
-const mainIds = ['home', 'operator', 'sessions', 'context', 'scheduled', 'share', 'publish']
+const mainIds = ['home', 'operator', 'sessions', 'context', 'scheduled', 'quickchat', 'chats', 'ask', 'share', 'publish']
 const mainScenes = mainIds.map((id) => scenes.find((scene) => scene.id === id)!)
 const moreScenes = scenes.filter((scene) => !mainIds.includes(scene.id))
 const src = (name: string) => `${base}demo/${name}`
