@@ -91,6 +91,24 @@ const allSections: Section[] = [
     ],
   },
   {
+    id: 'scheduled',
+    title: 'Scheduled tasks',
+    body: "Pick a workspace and a folder, write a command or a prompt for Claude or Codex, and say when: once, every hour, every day, on weekdays, weekly or monthly. It runs there on its own, with your Mac off, as that workspace's account, with the login, skills, MCP servers and connectors it already has. Every run keeps its status and output. Edit, pause or delete a task, or press Run now to try it.",
+    prompts: [
+      "1st of the month, 09:00: Brief me on last month in acme: what shipped, the pull requests still open, Sentry's new errors and the deploys. Email it to me.",
+      "Weekdays, 08:30: Read yesterday's commits and Linear updates and write my standup in standup.md.",
+      "Fridays, 16:00: Draft release notes from this week's merged pull requests and open them as a pull request.",
+      'Mondays, 07:00, a command: npm outdated && npm audit --omit=dev',
+    ],
+    shots: [
+      {
+        name: '24-scheduled',
+        alt: "The Scheduled page: tasks of the acme and beta workspaces as cards, among them Monthly briefing, Standup notes, Dependency check and Nightly database backup, each with its schedule, next run and last result. Monthly briefing is open beside the list, with its prompt, its runs and the output of the last one, a briefing of last month in acme.",
+        caption: 'Every task, its next run, and what each run printed.',
+      },
+    ],
+  },
+  {
     id: 'drop-files',
     title: 'Drop files onto a session',
     body: 'Drag files from Finder onto a session and they land on its machine, with the path typed at the prompt for you. Paste an image with ⌘V and it works the same way. Each file keeps its name plus the time, so nothing gets overwritten.',
@@ -321,6 +339,7 @@ const features = [
   { title: 'Grids', body: 'Several sessions of one workspace, side by side.' },
   { title: '⌘K', body: 'Jump to any screen, session, machine or action.' },
   { title: 'A context panel', body: 'Todo, pull requests, links, files and git of each session.' },
+  { title: 'Scheduled tasks', body: 'A command or a prompt that runs on its own in a workspace, on a schedule.' },
   { title: 'Home, stats and health', body: 'RAM, disk, load, containers and a health check of every machine.' },
   { title: 'A network map', body: 'Your machines by place, with their sites, links and workspaces.' },
   { title: 'Map as wallpaper', body: 'A photo, a gradient or your network behind Home.' },
@@ -338,6 +357,7 @@ const features = [
 const cliEquivalents = [
   { what: 'Publish a port', cmd: 'devmachine expose add acme 3000 --host app.example.com', href: `${base}reference/commands/#expose` },
   { what: 'Add a package', cmd: 'devmachine packages add claude-code --workspace acme', href: `${base}reference/commands/#packages` },
+  { what: 'Schedule a prompt', cmd: 'devmachine scheduled add --workspace acme --name "Monthly briefing" --folder ~/acme-web --harness claude --prompt "Brief me on last month" --every monthly --day 1 --at 09:00', href: `${base}reference/commands/#scheduled` },
   { what: 'Send a file to a workspace', cmd: 'devmachine upload mockup.png --workspace acme', href: `${base}reference/commands/#upload` },
   { what: 'See machine stats', cmd: 'devmachine stats', href: `${base}reference/commands/#stats` },
   { what: 'Run the health check', cmd: 'devmachine doctor', href: `${base}reference/commands/#doctor` },
@@ -437,6 +457,16 @@ const jsonLd = [
                     </li>
                   ))}
                 </ul>
+              )}
+              {section.id === 'scheduled' && (
+                <p class="text-sm mt-4">
+                  <a
+                    href={`${base}guides/scheduled-tasks/`}
+                    class="underline underline-offset-2 text-[var(--muted)] hover:text-[var(--ink)]"
+                  >
+                    More examples, and why it runs where you choose
+                  </a>
+                </p>
               )}
               {section.id === 'operator' && (
                 <p class="text-sm mt-4">
